@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的帖子管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://tdesign.tencent.com/miniprogram/design-tokens/tdesign-miniprogram.css">
+    <style>
+        .safe-area-top {
+            padding-top: env(safe-area-inset-top, 20px);
+        }
+        .safe-area-bottom {
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+        .post-item {
+            transition: all 0.2s ease;
+        }
+        .post-item:active {
+            transform: scale(0.98);
+        }
+        .badge {
+            position: relative;
+        }
+        .badge::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 顶部导航栏 -->
+    <div class="bg-white safe-area-top">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+            <button class="flex items-center">
+                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </button>
+            <h1 class="text-lg font-semibold text-gray-900">我的帖子</h1>
+            <div class="w-6"></div>
+        </div>
+    </div>
+
+    <!-- 帖子网格 -->
+    <div class="p-4">
+        <div class="grid grid-cols-3 gap-3">
+            <!-- 帖子1 - 正常 -->
+            <div class="post-item relative">
+                <img src="https://via.placeholder.com/100x100/4F46E5/FFFFFF?text=帖子1" alt="帖子预览" class="w-full aspect-square rounded-lg object-cover">
+                <div class="absolute top-1 right-1 bg-black bg-opacity-50 text-white text-xs px-1 py-0.5 rounded">
+                    3张
+                </div>
+            </div>
+
+            <!-- 帖子2 - 被驳回 -->
+            <div class="post-item relative badge">
+                <img src="https://via.placeholder.com/100x100/EF4444/FFFFFF?text=帖子2" alt="帖子预览" class="w-full aspect-square rounded-lg object-cover">
+                <div class="absolute top-1 right-1 bg-black bg-opacity-50 text-white text-xs px-1 py-0.5 rounded">
+                    2张
+                </div>
+            </div>
+
+            <!-- 帖子3 - 正常 -->
+            <div class="post-item relative">
+                <img src="https://via.placeholder.com/100x100/10B981/FFFFFF?text=帖子3" alt="帖子预览" class="w-full aspect-square rounded-lg object-cover">
+                <div class="absolute top-1 right-1 bg-black bg-opacity-50 text-white text-xs px-1 py-0.5 rounded">
+                    1张
+                </div>
+            </div>
+
+            <!-- 帖子4 - 正常 -->
+            <div class="post-item relative">
+                <img src="https://via.placeholder.com/100x100/F59E0B/FFFFFF?text=帖子4" alt="帖子预览" class="w-full aspect-square rounded-lg object-cover">
+                <div class="absolute top-1 right-1 bg-black bg-opacity-50 text-white text-xs px-1 py-0.5 rounded">
+                    4张
+                </div>
+            </div>
+
+            <!-- 帖子5 - 被驳回 -->
+            <div class="post-item relative badge">
+                <img src="https://via.placeholder.com/100x100/8B5CF6/FFFFFF?text=帖子5" alt="帖子预览" class="w-full aspect-square rounded-lg object-cover">
+                <div class="absolute top-1 right-1 bg-black bg-opacity-50 text-white text-xs px-1 py-0.5 rounded">
+                    2张
+                </div>
+            </div>
+
+            <!-- 帖子6 - 正常 -->
+            <div class="post-item relative">
+                <img src="https://via.placeholder.com/100x100/EC4899/FFFFFF?text=帖子6" alt="帖子预览" class="w-full aspect-square rounded-lg object-cover">
+                <div class="absolute top-1 right-1 bg-black bg-opacity-50 text-white text-xs px-1 py-0.5 rounded">
+                    1张
+                </div>
+            </div>
+
+            <!-- 帖子7 - 正常 -->
+            <div class="post-item relative">
+                <img src="https://via.placeholder.com/100x100/06B6D4/FFFFFF?text=帖子7" alt="帖子预览" class="w-full aspect-square rounded-lg object-cover">
+                <div class="absolute top-1 right-1 bg-black bg-opacity-50 text-white text-xs px-1 py-0.5 rounded">
+                    3张
+                </div>
+            </div>
+
+            <!-- 帖子8 - 正常 -->
+            <div class="post-item relative">
+                <img src="https://via.placeholder.com/100x100/84CC16/FFFFFF?text=帖子8" alt="帖子预览" class="w-full aspect-square rounded-lg object-cover">
+                <div class="absolute top-1 right-1 bg-black bg-opacity-50 text-white text-xs px-1 py-0.5 rounded">
+                    2张
+                </div>
+            </div>
+
+            <!-- 帖子9 - 被驳回 -->
+            <div class="post-item relative badge">
+                <img src="https://via.placeholder.com/100x100/F97316/FFFFFF?text=帖子9" alt="帖子预览" class="w-full aspect-square rounded-lg object-cover">
+                <div class="absolute top-1 right-1 bg-black bg-opacity-50 text-white text-xs px-1 py-0.5 rounded">
+                    1张
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部安全区域 -->
+    <div class="safe-area-bottom h-20"></div>
+</body>
+</html>
+

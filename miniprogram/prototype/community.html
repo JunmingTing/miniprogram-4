@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社区</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://tdesign.tencent.com/miniprogram/design-tokens/tdesign-miniprogram.css">
+    <style>
+        .safe-area-top {
+            padding-top: env(safe-area-inset-top, 20px);
+        }
+        .safe-area-bottom {
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+        .post-card {
+            transition: all 0.2s ease;
+        }
+        .post-card:active {
+            transform: scale(0.98);
+        }
+        .action-btn {
+            transition: all 0.2s ease;
+        }
+        .action-btn:active {
+            transform: scale(0.9);
+        }
+        .tag-btn {
+            transition: all 0.2s ease;
+        }
+        .tag-btn:active {
+            transform: scale(0.95);
+        }
+        .tag-btn.liked {
+            background-color: #FCD34D;
+            color: #92400E;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 顶部导航栏 -->
+    <div class="bg-white safe-area-top">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+            <h1 class="text-lg font-semibold text-gray-900">社区</h1>
+            <button class="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium">
+                发布
+            </button>
+        </div>
+    </div>
+
+    <!-- 帖子列表 -->
+    <div class="pb-20">
+        <!-- 帖子1 -->
+        <div class="post-card bg-white mb-2">
+            <!-- 用户信息 -->
+            <div class="flex items-center px-4 py-3">
+                <img src="https://via.placeholder.com/40x40/10B981/FFFFFF?text=用户" alt="用户头像" class="w-10 h-10 rounded-full mr-3">
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900">游戏达人</h3>
+                    <p class="text-xs text-gray-500">2024-01-15 16:30</p>
+                </div>
+            </div>
+
+            <!-- 图片轮播 -->
+            <div class="relative">
+                <img src="https://via.placeholder.com/375x200/4F46E5/FFFFFF?text=游戏截图1" alt="帖子图片" class="w-full h-48 object-cover">
+                <!-- 图片指示器 -->
+                <div class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                    1/3
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="px-4 py-3">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-4">
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-600">128</span>
+                        </button>
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-600">23</span>
+                        </button>
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-600">45</span>
+                        </button>
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.482 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                            </svg>
+                        </button>
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                        </button>
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 标签区域 -->
+                <div class="flex flex-wrap gap-2">
+                    <button class="tag-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs flex items-center space-x-1">
+                        <span>原神</span>
+                        <span class="text-gray-500">12</span>
+                    </button>
+                    <button class="tag-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs flex items-center space-x-1">
+                        <span>角色</span>
+                        <span class="text-gray-500">8</span>
+                    </button>
+                    <button class="tag-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs flex items-center space-x-1">
+                        <span>攻略</span>
+                        <span class="text-gray-500">5</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 帖子2 -->
+        <div class="post-card bg-white mb-2">
+            <!-- 用户信息 -->
+            <div class="flex items-center px-4 py-3">
+                <img src="https://via.placeholder.com/40x40/F59E0B/FFFFFF?text=玩家" alt="用户头像" class="w-10 h-10 rounded-full mr-3">
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900">电竞选手</h3>
+                    <p class="text-xs text-gray-500">2024-01-15 15:45</p>
+                </div>
+            </div>
+
+            <!-- 图片轮播 -->
+            <div class="relative">
+                <img src="https://via.placeholder.com/375x200/EF4444/FFFFFF?text=电竞截图" alt="帖子图片" class="w-full h-48 object-cover">
+                <!-- 图片指示器 -->
+                <div class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                    1/2
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="px-4 py-3">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-4">
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-600">256</span>
+                        </button>
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-600">67</span>
+                        </button>
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-600">89</span>
+                        </button>
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.482 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                            </svg>
+                        </button>
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                        </button>
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 标签区域 -->
+                <div class="flex flex-wrap gap-2">
+                    <button class="tag-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs flex items-center space-x-1">
+                        <span>LOL</span>
+                        <span class="text-gray-500">15</span>
+                    </button>
+                    <button class="tag-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs flex items-center space-x-1">
+                        <span>电竞</span>
+                        <span class="text-gray-500">9</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 帖子3 -->
+        <div class="post-card bg-white mb-2">
+            <!-- 用户信息 -->
+            <div class="flex items-center px-4 py-3">
+                <img src="https://via.placeholder.com/40x40/8B5CF6/FFFFFF?text=粉丝" alt="用户头像" class="w-10 h-10 rounded-full mr-3">
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900">游戏爱好者</h3>
+                    <p class="text-xs text-gray-500">2024-01-15 14:20</p>
+                </div>
+            </div>
+
+            <!-- 图片轮播 -->
+            <div class="relative">
+                <img src="https://via.placeholder.com/375x200/8B5CF6/FFFFFF?text=游戏截图" alt="帖子图片" class="w-full h-48 object-cover">
+                <!-- 图片指示器 -->
+                <div class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                    1/4
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="px-4 py-3">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-4">
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-600">89</span>
+                        </button>
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-600">12</span>
+                        </button>
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-600">34</span>
+                        </button>
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.482 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                            </svg>
+                        </button>
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                        </button>
+                        <button class="action-btn flex items-center space-x-1">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 标签区域 -->
+                <div class="flex flex-wrap gap-2">
+                    <button class="tag-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs flex items-center space-x-1">
+                        <span>手游</span>
+                        <span class="text-gray-500">6</span>
+                    </button>
+                    <button class="tag-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs flex items-center space-x-1">
+                        <span>攻略</span>
+                        <span class="text-gray-500">3</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-area-bottom">
+        <div class="flex items-center justify-around py-2">
+            <button class="flex flex-col items-center py-2 px-4 text-gray-400">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path>
+                </svg>
+                <span class="text-xs">首页</span>
+            </button>
+            <button class="flex flex-col items-center py-2 px-4 text-blue-500">
+                <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <span class="text-xs font-medium">社区</span>
+            </button>
+            <button class="flex flex-col items-center py-2 px-4 text-gray-400">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                <span class="text-xs">我的</span>
+            </button>
+        </div>
+    </div>
+</body>
+</html>
+
