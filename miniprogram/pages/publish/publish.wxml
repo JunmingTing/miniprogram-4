@@ -1,0 +1,85 @@
+<!--发布页面-->
+<view class="publish-container">
+  <!-- 图片上传区域 -->
+  <view class="upload-section">
+    <view class="upload-grid">
+      <!-- 已上传的图片 -->
+      <view class="image-item" wx:for="{{images}}" wx:key="index">
+        <t-image 
+          src="{{item}}" 
+          class="uploaded-image"
+          mode="aspectFill"
+          width="160rpx"
+          height="160rpx"
+        />
+        <view class="delete-btn" bind:tap="onDeleteImage" data-index="{{index}}">
+          <t-icon name="close" size="24rpx" color="#fff" />
+        </view>
+      </view>
+      
+      <!-- 添加图片按钮 -->
+      <view class="add-image-btn" wx:if="{{images.length < 5}}" bind:tap="onAddImage">
+        <t-icon name="add" size="60rpx" color="#ccc" />
+      </view>
+    </view>
+    <text class="upload-tip">最多上传5张图片</text>
+  </view>
+
+  <!-- 标签管理区域 -->
+  <view class="tags-section">
+    <view class="section-title">添加标签</view>
+    
+    <!-- 已添加的标签 -->
+    <view class="tags-list" wx:if="{{tags.length > 0}}">
+      <view class="tag-item" wx:for="{{tags}}" wx:key="index">
+        <t-tag 
+          theme="primary" 
+          size="small" 
+          closable
+          bind:close="onDeleteTag"
+          data-index="{{index}}"
+        >
+          {{item}}
+        </t-tag>
+      </view>
+    </view>
+
+    <!-- 添加标签输入框 -->
+    <view class="tag-input-container">
+      <input 
+        class="tag-input" 
+        placeholder="输入标签内容（最多12字）" 
+        value="{{tagInput}}"
+        maxlength="12"
+        bind:input="onTagInputChange"
+        bind:confirm="onAddTag"
+      />
+      <t-button 
+        theme="primary" 
+        size="small" 
+        bind:tap="onAddTag"
+        disabled="{{!tagInput.trim()}}"
+        class="add-tag-btn"
+      >
+        添加
+      </t-button>
+    </view>
+  </view>
+
+  <!-- 发布按钮 -->
+  <view class="publish-section">
+    <t-button 
+      theme="primary" 
+      size="large" 
+      block
+      bind:tap="onPublish"
+      disabled="{{images.length === 0}}"
+      loading="{{publishing}}"
+    >
+      {{publishing ? '发布中...' : '发布'}}
+    </t-button>
+  </view>
+</view>
+
+<!-- Toast提示 -->
+<t-toast id="t-toast" />

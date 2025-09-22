@@ -1,0 +1,36 @@
+<!--我的帖子管理页面-->
+<view class="my-posts-container">
+  <!-- 帖子网格 -->
+  <view class="posts-grid" wx:if="{{posts.length > 0}}">
+    <view class="post-item" wx:for="{{posts}}" wx:key="id" bind:tap="onPostTap" data-post="{{item}}">
+      <t-image 
+        src="{{item.coverImage}}" 
+        class="post-image"
+        mode="aspectFill"
+        width="100%"
+        height="200rpx"
+      />
+      <view class="post-info">
+        <text class="image-count">{{item.imageCount}}张</text>
+        <t-badge 
+          wx:if="{{item.isRejected}}"
+          count="1" 
+          max-count="99"
+          class="reject-badge"
+        />
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <t-loading size="60rpx" />
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <t-empty wx:if="{{!loading && posts.length === 0}}" 
+    icon="image" 
+    description="暂无帖子内容" 
+  />
+</view>

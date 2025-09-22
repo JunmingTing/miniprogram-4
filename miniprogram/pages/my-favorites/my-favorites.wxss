@@ -1,0 +1,139 @@
+/* 我的收藏页面样式 */
+.my-favorites-container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 收藏列表 */
+.favorites-list {
+  padding: 20rpx;
+}
+
+.favorite-item {
+  background-color: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.favorite-item:active {
+  transform: scale(0.98);
+}
+
+.item-content {
+  display: flex;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.item-image {
+  border-radius: 8rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.4;
+  margin-bottom: 10rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.item-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.item-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 30rpx;
+}
+
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10rpx;
+  border-radius: 8rpx;
+  transition: background-color 0.2s;
+}
+
+.action-item:active {
+  background-color: #f0f0f0;
+}
+
+.action-text {
+  font-size: 20rpx;
+  color: #666;
+  margin-top: 4rpx;
+}
+
+/* 帖子网格 */
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20rpx;
+  padding: 20rpx;
+}
+
+.post-item {
+  position: relative;
+  background-color: #fff;
+  border-radius: 12rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.post-item:active {
+  transform: scale(0.98);
+}
+
+.post-image {
+  width: 100%;
+  height: 200rpx;
+}
+
+.post-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+  padding: 20rpx 16rpx 16rpx;
+}
+
+.image-count {
+  color: #fff;
+  font-size: 20rpx;
+  font-weight: 500;
+}
+
+/* 加载状态 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx;
+  color: #999;
+}
+
+.loading-text {
+  font-size: 24rpx;
+  margin-top: 20rpx;
+}

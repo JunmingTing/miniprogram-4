@@ -1,0 +1,122 @@
+/* 发布页面样式 */
+.publish-container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding: 20rpx;
+}
+
+/* 图片上传区域 */
+.upload-section {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.upload-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.image-item {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+}
+
+.uploaded-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+}
+
+.delete-btn {
+  position: absolute;
+  top: -10rpx;
+  right: -10rpx;
+  width: 40rpx;
+  height: 40rpx;
+  background-color: #ff4d4f;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 8rpx rgba(255, 77, 79, 0.3);
+}
+
+.add-image-btn {
+  width: 160rpx;
+  height: 160rpx;
+  border: 2rpx dashed #ccc;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fafafa;
+  transition: all 0.2s;
+}
+
+.add-image-btn:active {
+  background-color: #f0f0f0;
+  transform: scale(0.95);
+}
+
+.upload-tip {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 标签管理区域 */
+.tags-section {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.tag-item {
+  margin-bottom: 16rpx;
+}
+
+.tag-input-container {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.tag-input {
+  flex: 1;
+  height: 80rpx;
+  border: 1rpx solid #e5e5e5;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  background-color: #fafafa;
+}
+
+.add-tag-btn {
+  flex-shrink: 0;
+  height: 80rpx;
+  padding: 0 30rpx;
+}
+
+/* 发布按钮区域 */
+.publish-section {
+  padding: 40rpx 0;
+}

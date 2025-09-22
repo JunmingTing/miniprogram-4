@@ -1,0 +1,139 @@
+<!--社区页面 - 帖子列表-->
+<view class="community-container">
+  <!-- 固定发布按钮 -->
+  <view class="fixed-publish-btn" bind:tap="onPublishTap">
+    <t-icon name="add" size="40rpx" color="#fff" />
+  </view>
+
+  <!-- 帖子列表 -->
+  <view class="posts-list">
+    <view class="post-item" wx:for="{{posts}}" wx:key="id" bind:tap="onPostTap" data-post="{{item}}">
+      <!-- 用户信息 -->
+      <view class="post-header">
+        <t-avatar 
+          src="{{item.author.avatar}}" 
+          size="80rpx"
+          class="author-avatar"
+        />
+        <view class="author-info">
+          <text class="author-name">{{item.author.name}}</text>
+          <text class="post-time">{{item.time}}</text>
+        </view>
+      </view>
+
+      <!-- 图片轮播 -->
+      <view class="post-images" wx:if="{{item.images.length > 0}}">
+        <t-swiper 
+          current="{{item.currentImageIndex}}"
+          bind:change="onImageChange"
+          data-post-id="{{item.id}}"
+          class="post-swiper"
+        >
+          <t-swiper-item wx:for="{{item.images}}" wx:key="index" wx:for-item="image">
+            <t-image 
+              src="{{image}}" 
+              class="post-image"
+              mode="aspectFill"
+              width="100%"
+              height="400rpx"
+            />
+          </t-swiper-item>
+        </t-swiper>
+        
+        <!-- 图片指示器 -->
+        <view class="image-indicator" wx:if="{{item.images.length > 1}}">
+          <text class="indicator-text">{{item.currentImageIndex + 1}}/{{item.images.length}}</text>
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="post-actions">
+        <view class="action-item" bind:tap="onLikeTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="{{item.isLiked ? 'heart-filled' : 'heart'}}" size="40rpx" color="{{item.isLiked ? '#ff4d4f' : '#999'}}" />
+          <text class="action-text">{{item.likeCount}}</text>
+        </view>
+        <view class="action-item" bind:tap="onCommentTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="chat" size="40rpx" color="#999" />
+          <text class="action-text">{{item.commentCount}}</text>
+        </view>
+        <view class="action-item" bind:tap="onFavoriteTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="{{item.isFavorited ? 'bookmark-filled' : 'bookmark'}}" size="40rpx" color="{{item.isFavorited ? '#ff4d4f' : '#999'}}" />
+          <text class="action-text">{{item.favoriteCount}}</text>
+        </view>
+        <view class="action-item" bind:tap="onShareTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="share" size="40rpx" color="#999" />
+        </view>
+        <view class="action-item" bind:tap="onReportTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="error-circle" size="40rpx" color="#999" />
+        </view>
+        <view class="action-item" bind:tap="onAddTagTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="add-circle" size="40rpx" color="#999" />
+        </view>
+      </view>
+
+      <!-- 标签区域 -->
+      <view class="post-tags" wx:if="{{item.tags.length > 0}}">
+        <view class="tag-item" wx:for="{{item.tags}}" wx:key="id" bind:tap="onTagTap" data-tag="{{item}}" catchtap="true">
+          <t-tag 
+            theme="{{item.isLiked ? 'warning' : 'default'}}"
+            size="small"
+            class="post-tag"
+          >
+            {{item.text}} {{item.likeCount}}
+          </t-tag>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{loading}}">
+    <t-loading size="40rpx" />
+    <text class="load-text">加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <t-empty wx:if="{{!loading && posts.length === 0}}" 
+    icon="image" 
+    description="暂无帖子内容" 
+  />
+</view>
+
+<!-- 添加标签对话框 -->
+<t-dialog
+  visible="{{showTagDialog}}"
+  title="添加标签"
+  content="请输入标签内容（最多12字）"
+  bind:confirm="onTagConfirm"
+  bind:cancel="onTagCancel"
+>
+  <view class="tag-input-container">
+    <input 
+      class="tag-input" 
+      placeholder="输入标签内容" 
+      value="{{tagText}}"
+      maxlength="12"
+      bind:input="onTagTextChange"
+      focus="{{showTagDialog}}"
+    />
+  </view>
+</t-dialog>
+
+<!-- 举报对话框 -->
+<t-dialog
+  visible="{{showReportDialog}}"
+  title="举报内容"
+  content="请选择举报原因"
+  bind:confirm="onReportConfirm"
+  bind:cancel="onReportCancel"
+>
+  <view class="report-options">
+    <view class="report-option" wx:for="{{reportOptions}}" wx:key="value" bind:tap="onSelectReportReason" data-value="{{item.value}}">
+      <text class="report-option-text">{{item.label}}</text>
+      <t-icon name="{{selectedReportReason === item.value ? 'check-circle-filled' : 'circle'}}" size="32rpx" color="{{selectedReportReason === item.value ? '#0052D9' : '#ccc'}}" />
+    </view>
+  </view>
+</t-dialog>
+
+<!-- Toast提示 -->
+<t-toast id="t-toast" />

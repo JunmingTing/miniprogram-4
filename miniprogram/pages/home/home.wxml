@@ -1,0 +1,100 @@
+<!--首页 - 游戏资讯列表-->
+<view class="home-container">
+  <!-- 搜索栏 -->
+  <view class="search-section">
+    <t-search 
+      value="{{searchValue}}" 
+      placeholder="搜索游戏资讯..." 
+      bind:change="onSearchChange"
+      bind:submit="onSearchSubmit"
+      bind:clear="onSearchClear"
+    />
+  </view>
+
+  <!-- 置顶资讯 -->
+  <view class="pinned-news" wx:if="{{pinnedNews.length > 0}}">
+    <view class="pinned-label">
+      <t-tag theme="danger" size="small">置顶</t-tag>
+    </view>
+    <view class="news-item" wx:for="{{pinnedNews}}" wx:key="id" bind:tap="onNewsTap" data-news="{{item}}">
+      <view class="news-content">
+        <t-image 
+          src="{{item.image}}" 
+          class="news-image"
+          mode="aspectFill"
+          width="80rpx"
+          height="60rpx"
+        />
+        <view class="news-info">
+          <text class="news-title">{{item.title}}</text>
+          <text class="news-time">{{item.time}}</text>
+        </view>
+      </view>
+      <view class="news-actions">
+        <view class="action-item" bind:tap="onLikeTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="{{item.isLiked ? 'heart-filled' : 'heart'}}" size="32rpx" color="{{item.isLiked ? '#ff4d4f' : '#999'}}" />
+          <text class="action-text">{{item.likeCount}}</text>
+        </view>
+        <view class="action-item" bind:tap="onCommentTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="chat" size="32rpx" color="#999" />
+          <text class="action-text">{{item.commentCount}}</text>
+        </view>
+        <view class="action-item" bind:tap="onFavoriteTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="{{item.isFavorited ? 'bookmark-filled' : 'bookmark'}}" size="32rpx" color="{{item.isFavorited ? '#ff4d4f' : '#999'}}" />
+          <text class="action-text">{{item.favoriteCount}}</text>
+        </view>
+        <view class="action-item" bind:tap="onShareTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="share" size="32rpx" color="#999" />
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 普通资讯列表 -->
+  <view class="news-list">
+    <view class="news-item" wx:for="{{newsList}}" wx:key="id" bind:tap="onNewsTap" data-news="{{item}}">
+      <view class="news-content">
+        <t-image 
+          src="{{item.image}}" 
+          class="news-image"
+          mode="aspectFill"
+          width="80rpx"
+          height="60rpx"
+        />
+        <view class="news-info">
+          <text class="news-title">{{item.title}}</text>
+          <text class="news-time">{{item.time}}</text>
+        </view>
+      </view>
+      <view class="news-actions">
+        <view class="action-item" bind:tap="onLikeTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="{{item.isLiked ? 'heart-filled' : 'heart'}}" size="32rpx" color="{{item.isLiked ? '#ff4d4f' : '#999'}}" />
+          <text class="action-text">{{item.likeCount}}</text>
+        </view>
+        <view class="action-item" bind:tap="onCommentTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="chat" size="32rpx" color="#999" />
+          <text class="action-text">{{item.commentCount}}</text>
+        </view>
+        <view class="action-item" bind:tap="onFavoriteTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="{{item.isFavorited ? 'bookmark-filled' : 'bookmark'}}" size="32rpx" color="{{item.isFavorited ? '#ff4d4f' : '#999'}}" />
+          <text class="action-text">{{item.favoriteCount}}</text>
+        </view>
+        <view class="action-item" bind:tap="onShareTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="share" size="32rpx" color="#999" />
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{loading}}">
+    <t-loading size="40rpx" />
+    <text class="load-text">加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <t-empty wx:if="{{!loading && newsList.length === 0 && pinnedNews.length === 0}}" 
+    icon="search" 
+    description="暂无资讯内容" 
+  />
+</view>

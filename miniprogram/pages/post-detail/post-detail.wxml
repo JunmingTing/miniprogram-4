@@ -1,0 +1,109 @@
+<!--帖子详情页-->
+<view class="post-detail-container">
+  <!-- 用户信息 -->
+  <view class="post-header">
+    <t-avatar 
+      src="{{postDetail.author.avatar}}" 
+      size="80rpx"
+      class="author-avatar"
+    />
+    <view class="author-info">
+      <text class="author-name">{{postDetail.author.name}}</text>
+      <text class="post-time">{{postDetail.time}}</text>
+    </view>
+    <t-button 
+      wx:if="{{isMyPost}}"
+      theme="danger" 
+      variant="text" 
+      size="small"
+      bind:tap="onDeleteTap"
+    >
+      删除
+    </t-button>
+  </view>
+
+  <!-- 图片轮播 -->
+  <view class="post-images" wx:if="{{postDetail.images.length > 0}}">
+    <t-swiper 
+      current="{{postDetail.currentImageIndex}}"
+      bind:change="onImageChange"
+      class="post-swiper"
+    >
+      <t-swiper-item wx:for="{{postDetail.images}}" wx:key="index" wx:for-item="image">
+        <t-image 
+          src="{{image}}" 
+          class="post-image"
+          mode="aspectFill"
+          width="100%"
+          height="600rpx"
+        />
+      </t-swiper-item>
+    </t-swiper>
+    
+    <!-- 图片指示器 -->
+    <view class="image-indicator" wx:if="{{postDetail.images.length > 1}}">
+      <text class="indicator-text">{{postDetail.currentImageIndex + 1}}/{{postDetail.images.length}}</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="post-actions">
+    <view class="action-item" bind:tap="onLikeTap">
+      <t-icon name="{{postDetail.isLiked ? 'heart-filled' : 'heart'}}" size="40rpx" color="{{postDetail.isLiked ? '#ff4d4f' : '#999'}}" />
+      <text class="action-text">{{postDetail.likeCount}}</text>
+    </view>
+    <view class="action-item" bind:tap="onCommentTap">
+      <t-icon name="chat" size="40rpx" color="#999" />
+      <text class="action-text">{{postDetail.commentCount}}</text>
+    </view>
+    <view class="action-item" bind:tap="onFavoriteTap">
+      <t-icon name="{{postDetail.isFavorited ? 'bookmark-filled' : 'bookmark'}}" size="40rpx" color="{{postDetail.isFavorited ? '#ff4d4f' : '#999'}}" />
+      <text class="action-text">{{postDetail.favoriteCount}}</text>
+    </view>
+    <view class="action-item" bind:tap="onShareTap">
+      <t-icon name="share" size="40rpx" color="#999" />
+    </view>
+  </view>
+
+  <!-- 标签区域 -->
+  <view class="post-tags" wx:if="{{postDetail.tags.length > 0}}">
+    <view class="tag-item" wx:for="{{postDetail.tags}}" wx:key="id" bind:tap="onTagTap" data-tag="{{item}}">
+      <t-tag 
+        theme="{{item.isLiked ? 'warning' : 'default'}}"
+        size="small"
+        class="post-tag"
+      >
+        {{item.text}} {{item.likeCount}}
+      </t-tag>
+    </view>
+  </view>
+
+  <!-- 驳回理由（仅我的帖子且被驳回时显示） -->
+  <view class="reject-reason" wx:if="{{isMyPost && postDetail.isRejected}}">
+    <view class="reject-header">
+      <t-icon name="error-circle" size="32rpx" color="#ff4d4f" />
+      <text class="reject-title">帖子被驳回</text>
+    </view>
+    <text class="reject-text">{{postDetail.rejectReason}}</text>
+    <t-button 
+      theme="primary" 
+      size="small" 
+      bind:tap="onRepublishTap"
+      class="republish-btn"
+    >
+      重新发布
+    </t-button>
+  </view>
+</view>
+
+<!-- 删除确认对话框 -->
+<t-dialog
+  visible="{{showDeleteDialog}}"
+  title="删除帖子"
+  content="确定要删除这个帖子吗？删除后无法恢复。"
+  bind:confirm="onDeleteConfirm"
+  bind:cancel="onDeleteCancel"
+/>
+
+<!-- Toast提示 -->
+<t-toast id="t-toast" />

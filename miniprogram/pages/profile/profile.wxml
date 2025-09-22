@@ -1,0 +1,122 @@
+<!--我的页面-->
+<view class="profile-container">
+  <!-- 用户信息区域 -->
+  <view class="user-section">
+    <view class="user-info" wx:if="{{isLoggedIn}}">
+      <t-avatar 
+        src="{{userInfo.avatar}}" 
+        size="160rpx"
+        class="user-avatar"
+      />
+      <view class="user-details">
+        <text class="user-name">{{userInfo.nickName}}</text>
+        <text class="user-desc">微信用户</text>
+      </view>
+    </view>
+    
+    <!-- 未登录状态 -->
+    <view class="login-section" wx:else bind:tap="onLoginTap">
+      <t-avatar 
+        src="https://via.placeholder.com/160x160/4F46E5/FFFFFF?text=头像" 
+        size="160rpx"
+        class="user-avatar"
+      />
+      <view class="user-details">
+        <text class="user-name">点击登录</text>
+        <text class="user-desc">使用微信一键登录</text>
+      </view>
+      <t-icon name="chevron-right" size="32rpx" color="#ccc" />
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-section">
+    <t-cell-group>
+      <!-- 管理帖子 -->
+      <t-cell 
+        title="管理帖子" 
+        description="管理你发布的帖子"
+        left-icon="edit"
+        right-icon="chevron-right"
+        bind:tap="onMyPostsTap"
+        class="menu-cell"
+      >
+        <t-badge 
+          wx:if="{{hasRejectedPosts}}"
+          count="1" 
+          max-count="99"
+          slot="right-icon"
+        />
+      </t-cell>
+      
+      <!-- 我的收藏 -->
+      <t-cell 
+        title="我的收藏" 
+        description="查看收藏的资讯和帖子"
+        left-icon="bookmark"
+        right-icon="chevron-right"
+        bind:tap="onMyFavoritesTap"
+        class="menu-cell"
+      />
+    </t-cell-group>
+  </view>
+
+  <!-- 其他功能 -->
+  <view class="other-section">
+    <t-cell-group>
+      <!-- 设置 -->
+      <t-cell 
+        title="设置" 
+        description="应用设置和偏好"
+        left-icon="setting"
+        right-icon="chevron-right"
+        bind:tap="onSettingsTap"
+        class="menu-cell"
+      />
+      
+      <!-- 关于我们 -->
+      <t-cell 
+        title="关于我们" 
+        description="了解更多信息"
+        left-icon="help-circle"
+        right-icon="chevron-right"
+        bind:tap="onAboutTap"
+        class="menu-cell"
+      />
+    </t-cell-group>
+  </view>
+
+  <!-- 退出登录按钮 -->
+  <view class="logout-section" wx:if="{{isLoggedIn}}">
+    <t-button 
+      theme="danger" 
+      variant="outline" 
+      size="large" 
+      block
+      bind:tap="onLogoutTap"
+    >
+      退出登录
+    </t-button>
+  </view>
+</view>
+
+<!-- 登录对话框 -->
+<t-dialog
+  visible="{{showLoginDialog}}"
+  title="微信登录"
+  content="是否使用微信账号登录？"
+  bind:confirm="onLoginConfirm"
+  bind:cancel="onLoginCancel"
+/>
+
+<!-- 退出登录对话框 -->
+<t-dialog
+  visible="{{showLogoutDialog}}"
+  title="退出登录"
+  content="确定要退出登录吗？"
+  bind:confirm="onLogoutConfirm"
+  bind:cancel="onLogoutCancel"
+/>
+
+<!-- Toast提示 -->
+<t-toast id="t-toast" />

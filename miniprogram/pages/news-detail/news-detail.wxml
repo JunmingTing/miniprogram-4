@@ -1,0 +1,122 @@
+<!--资讯详情页-->
+<view class="news-detail-container">
+  <!-- 资讯内容 -->
+  <view class="news-content" wx:if="{{newsDetail}}">
+    <!-- 标题和发布时间 -->
+    <view class="news-header">
+      <text class="news-title">{{newsDetail.title}}</text>
+      <text class="news-time">{{newsDetail.time}}</text>
+    </view>
+
+    <!-- 内容图片 -->
+    <view class="news-image-section">
+      <t-image 
+        src="{{newsDetail.image}}" 
+        class="news-image"
+        mode="aspectFill"
+        width="100%"
+        height="400rpx"
+      />
+    </view>
+
+    <!-- 内容文本 -->
+    <view class="news-text">
+      <text class="content-text">{{newsDetail.content}}</text>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="news-actions">
+      <view class="action-item" bind:tap="onLikeTap">
+        <t-icon name="{{newsDetail.isLiked ? 'heart-filled' : 'heart'}}" size="40rpx" color="{{newsDetail.isLiked ? '#ff4d4f' : '#999'}}" />
+        <text class="action-text">{{newsDetail.likeCount}}</text>
+      </view>
+      <view class="action-item" bind:tap="onFavoriteTap">
+        <t-icon name="{{newsDetail.isFavorited ? 'bookmark-filled' : 'bookmark'}}" size="40rpx" color="{{newsDetail.isFavorited ? '#ff4d4f' : '#999'}}" />
+        <text class="action-text">{{newsDetail.favoriteCount}}</text>
+      </view>
+      <view class="action-item" bind:tap="onShareTap">
+        <t-icon name="share" size="40rpx" color="#999" />
+      </view>
+      <view class="action-item" bind:tap="onReportTap">
+        <t-icon name="error-circle" size="40rpx" color="#999" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 评论区 -->
+  <view class="comments-section">
+    <view class="comments-header">
+      <text class="comments-title">评论区</text>
+    </view>
+    
+    <view class="comments-list">
+      <view class="comment-item" wx:for="{{comments}}" wx:key="id">
+        <t-avatar 
+          src="{{item.avatar}}" 
+          size="80rpx"
+          class="comment-avatar"
+        />
+        <view class="comment-content">
+          <view class="comment-header">
+            <text class="comment-author">{{item.author}}</text>
+            <text class="comment-time">{{item.time}}</text>
+          </view>
+          <text class="comment-text">{{item.content}}</text>
+          <view class="comment-actions">
+            <view class="comment-action" bind:tap="onCommentLikeTap" data-id="{{item.id}}">
+              <t-icon name="{{item.isLiked ? 'heart-filled' : 'heart'}}" size="24rpx" color="{{item.isLiked ? '#ff4d4f' : '#999'}}" />
+              <text class="comment-action-text">{{item.likeCount}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部评论输入框 -->
+  <view class="comment-input-section">
+    <view class="comment-input-container">
+      <t-textarea 
+        value="{{commentText}}"
+        placeholder="写下你的评论..."
+        bind:change="onCommentTextChange"
+        maxlength="200"
+        class="comment-textarea"
+      />
+      <t-button 
+        theme="primary" 
+        size="small" 
+        bind:tap="onCommentSubmit"
+        disabled="{{!commentText.trim()}}"
+        class="comment-submit-btn"
+      >
+        发布
+      </t-button>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <t-loading size="60rpx" />
+    <text class="loading-text">加载中...</text>
+  </view>
+</view>
+
+<!-- 举报对话框 -->
+<t-dialog
+  visible="{{showReportDialog}}"
+  title="举报内容"
+  content="请选择举报原因"
+  bind:confirm="onReportConfirm"
+  bind:cancel="onReportCancel"
+>
+  <view class="report-options">
+    <view class="report-option" wx:for="{{reportOptions}}" wx:key="value" bind:tap="onSelectReportReason" data-value="{{item.value}}">
+      <text class="report-option-text">{{item.label}}</text>
+      <t-icon name="{{selectedReportReason === item.value ? 'check-circle-filled' : 'circle'}}" size="32rpx" color="{{selectedReportReason === item.value ? '#0052D9' : '#ccc'}}" />
+    </view>
+  </view>
+</t-dialog>
+
+<!-- Toast提示 -->
+<t-toast id="t-toast" />
