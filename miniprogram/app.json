@@ -43,6 +43,8 @@
   },
   "componentFramework": "glass-easel",
   "lazyCodeLoading": "requiredComponents",
+  "cloud": true,
+  "cloudfunctionRoot": "cloudfunctions/",
   "usingComponents": {
     "t-button": "tdesign-miniprogram/button/button",
     "t-cell": "tdesign-miniprogram/cell/cell",

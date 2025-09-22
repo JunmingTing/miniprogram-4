@@ -7,10 +7,11 @@
         src="{{userInfo.avatar}}" 
         size="160rpx"
         class="user-avatar"
+        bind:tap="onAvatarTap"
       />
       <view class="user-details">
-        <text class="user-name">{{userInfo.nickName}}</text>
-        <text class="user-desc">微信用户</text>
+        <text class="user-name" bind:tap="onNicknameTap">{{userInfo.nickName}}</text>
+        <text class="user-desc">点击设置头像昵称</text>
       </view>
     </view>
     
@@ -74,6 +75,16 @@
         class="menu-cell"
       />
       
+      <!-- 测试云函数 -->
+      <t-cell 
+        title="测试云函数" 
+        description="检查云开发环境"
+        left-icon="bug"
+        right-icon="chevron-right"
+        bind:tap="onTestCloudFunction"
+        class="menu-cell"
+      />
+      
       <!-- 关于我们 -->
       <t-cell 
         title="关于我们" 
@@ -99,15 +110,6 @@
     </t-button>
   </view>
 </view>
-
-<!-- 登录对话框 -->
-<t-dialog
-  visible="{{showLoginDialog}}"
-  title="微信登录"
-  content="是否使用微信账号登录？"
-  bind:confirm="onLoginConfirm"
-  bind:cancel="onLoginCancel"
-/>
 
 <!-- 退出登录对话框 -->
 <t-dialog
