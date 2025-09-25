@@ -353,6 +353,10 @@ Page({
       success: (loginRes) => {
         const userInfo = loginRes.result as any;
         
+        // 保存旧头像URL用于后续删除
+        const oldAvatar = userInfo.userInfo?.avatarUrl || '';
+        console.log('publish页面 - 旧头像URL:', oldAvatar);
+        
         // 更新数据库中的用户头像
         (wx.cloud.database().collection('users').where({
           openid: userInfo.openid
@@ -377,6 +381,11 @@ Page({
               icon: 'success'
             });
 
+            // 如果有旧头像，删除旧头像
+            if (oldAvatar && oldAvatar.trim() !== '') {
+              this.deleteOldAvatar(oldAvatar);
+            }
+
             // 触发全局事件，通知其他页面更新头像
             if ((wx as any).eventBus && (wx as any).eventBus.emit) {
               (wx as any).eventBus.emit('avatarUpdated', { avatar: avatarFileID });
@@ -399,6 +408,45 @@ Page({
           title: '获取用户信息失败',
           icon: 'error'
         });
+      }
+    });
+  },
+
+  // 删除旧头像
+  deleteOldAvatar(oldAvatar: string) {
+    console.log('=== publish页面 - 开始删除旧头像 ===');
+    console.log('旧头像URL:', oldAvatar);
+    
+    // 检查是否是有效的云存储fileID
+    if (!oldAvatar || !oldAvatar.startsWith('cloud://')) {
+      console.log('旧头像不是云存储文件，跳过删除');
+      return;
+    }
+    
+    // 移除URL参数（如?v=1234567890）
+    const cleanFileID = oldAvatar.split('?')[0];
+    console.log('清理后的fileID:', cleanFileID);
+    
+    wx.cloud.callFunction({
+      name: 'deleteFile',
+      data: {
+        fileList: [cleanFileID]
+      },
+      success: (res: any) => {
+        console.log('publish页面 - 删除旧头像云函数调用成功:', res);
+        
+        if (res.result && res.result.success) {
+          console.log('publish页面 - 旧头像删除成功，删除数量:', res.result.deletedCount);
+          if (res.result.failedCount > 0) {
+            console.warn('publish页面 - 部分文件删除失败，失败数量:', res.result.failedCount);
+            console.warn('删除详情:', res.result.details);
+          }
+        } else {
+          console.error('publish页面 - 旧头像删除失败:', res.result);
+        }
+      },
+      fail: (err) => {
+        console.error('publish页面 - 删除旧头像云函数调用失败:', err);
       }
     });
   },

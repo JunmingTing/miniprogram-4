@@ -248,6 +248,10 @@ Page({
     console.log('云存储路径:', cloudPath);
     console.log('当前用户信息:', this.data.userInfo);
     
+    // 保存旧头像URL用于后续删除
+    const oldAvatar = this.data.userInfo.avatar;
+    console.log('旧头像URL:', oldAvatar);
+    
     // 立即更新界面显示 - 添加时间戳参数避免缓存
     const newUserInfo = {
       ...this.data.userInfo,
@@ -269,7 +273,7 @@ Page({
     console.log('本地存储已更新');
 
     // 更新数据库中的用户信息
-    this.updateUserInfo({ avatar: fileID });
+    this.updateUserInfo({ avatar: fileID }, oldAvatar);
     
     wx.showToast({
       title: '头像更新成功',
@@ -295,9 +299,10 @@ Page({
   },
 
   // 更新用户信息
-  updateUserInfo(updateData: { nickName?: string; avatar?: string }) {
+  updateUserInfo(updateData: { nickName?: string; avatar?: string }, oldAvatar?: string) {
     console.log('开始更新用户信息:', updateData);
     console.log('用户ID:', this.data.userInfo._id);
+    console.log('旧头像URL:', oldAvatar);
     
     wx.cloud.callFunction({
       name: 'updateUserInfo',
@@ -329,6 +334,11 @@ Page({
           
           wx.hideLoading();
           
+          // 如果是头像更新且有旧头像，删除旧头像
+          if (updateData.avatar && oldAvatar && oldAvatar.trim() !== '') {
+            this.deleteOldAvatar(oldAvatar);
+          }
+          
           // 如果是头像更新，不显示额外的成功提示（因为组件已经显示了）
           if (!updateData.avatar) {
             wx.showToast({
@@ -356,6 +366,44 @@ Page({
     });
   },
 
+  // 删除旧头像
+  deleteOldAvatar(oldAvatar: string) {
+    console.log('=== 开始删除旧头像 ===');
+    console.log('旧头像URL:', oldAvatar);
+    
+    // 检查是否是有效的云存储fileID
+    if (!oldAvatar || !oldAvatar.startsWith('cloud://')) {
+      console.log('旧头像不是云存储文件，跳过删除');
+      return;
+    }
+    
+    // 移除URL参数（如?v=1234567890）
+    const cleanFileID = oldAvatar.split('?')[0];
+    console.log('清理后的fileID:', cleanFileID);
+    
+    wx.cloud.callFunction({
+      name: 'deleteFile',
+      data: {
+        fileList: [cleanFileID]
+      },
+      success: (res: any) => {
+        console.log('删除旧头像云函数调用成功:', res);
+        
+        if (res.result && res.result.success) {
+          console.log('旧头像删除成功，删除数量:', res.result.deletedCount);
+          if (res.result.failedCount > 0) {
+            console.warn('部分文件删除失败，失败数量:', res.result.failedCount);
+            console.warn('删除详情:', res.result.details);
+          }
+        } else {
+          console.error('旧头像删除失败:', res.result);
+        }
+      },
+      fail: (err) => {
+        console.error('删除旧头像云函数调用失败:', err);
+      }
+    });
+  },
 
   // 管理帖子
   onMyPostsTap() {
