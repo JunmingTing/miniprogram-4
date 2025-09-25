@@ -3,12 +3,17 @@
   <!-- 用户信息区域 -->
   <view class="user-section">
     <view class="user-info" wx:if="{{isLoggedIn}}">
-      <t-avatar 
-        src="{{userInfo.avatar}}" 
-        size="160rpx"
-        class="user-avatar"
-        bind:tap="onAvatarTap"
-      />
+      <view class="user-avatar-container" bind:tap="onAvatarTap">
+        <image 
+          src="{{userInfo.avatar}}" 
+          class="user-avatar"
+          mode="aspectFill"
+          wx:if="{{userInfo.avatar}}"
+        />
+        <view class="user-avatar-placeholder" wx:else>
+          <t-icon name="user" size="80rpx" color="#ccc" />
+        </view>
+      </view>
       <view class="user-details">
         <text class="user-name" bind:tap="onNicknameTap">{{userInfo.nickName}}</text>
         <text class="user-desc">点击设置头像昵称</text>
@@ -85,6 +90,16 @@
         class="menu-cell"
       />
       
+      <!-- 上传测试 -->
+      <t-cell 
+        title="上传测试" 
+        description="调试头像上传问题"
+        left-icon="upload"
+        right-icon="chevron-right"
+        bind:tap="onTestUploadTap"
+        class="menu-cell"
+      />
+      
       <!-- 关于我们 -->
       <t-cell 
         title="关于我们" 
@@ -118,6 +133,15 @@
   content="确定要退出登录吗？"
   bind:confirm="onLogoutConfirm"
   bind:cancel="onLogoutCancel"
+/>
+
+<!-- 头像上传弹窗 -->
+<avatar-upload-dialog
+  visible="{{showAvatarDialog}}"
+  current-avatar="{{userInfo.avatar}}"
+  user-id="{{userInfo._id}}"
+  bind:close="onAvatarDialogClose"
+  bind:upload-success="onAvatarUploadSuccess"
 />
 
 <!-- Toast提示 -->

@@ -1,0 +1,82 @@
+<!--测试上传页面-->
+<view class="test-upload-container">
+  <view class="header">
+    <text class="title">云存储上传测试</text>
+    <text class="subtitle">用于调试头像上传问题</text>
+  </view>
+
+  <view class="test-section">
+    <view class="section-title">环境测试</view>
+    
+    <t-button 
+      theme="primary" 
+      size="large" 
+      block
+      bind:tap="testCloudFunction"
+      class="test-button"
+    >
+      测试基础云函数
+    </t-button>
+    
+    <t-button 
+      theme="primary" 
+      size="large" 
+      block
+      bind:tap="testStoragePermission"
+      class="test-button"
+    >
+      测试云存储权限
+    </t-button>
+  </view>
+
+  <view class="test-section">
+    <view class="section-title">上传测试</view>
+    
+    <t-button 
+      theme="primary" 
+      size="large" 
+      block
+      bind:tap="chooseTestImage"
+      class="test-button"
+      disabled="{{isUploading}}"
+    >
+      {{isUploading ? '上传中...' : '选择图片并上传'}}
+    </t-button>
+    
+    <view class="progress-container" wx:if="{{isUploading}}">
+      <t-progress 
+        percentage="{{uploadProgress}}" 
+        status="{{uploadProgress === 100 ? 'success' : 'active'}}"
+      />
+      <text class="progress-text">{{uploadProgress}}%</text>
+    </view>
+  </view>
+
+  <view class="result-section">
+    <view class="section-title">测试结果</view>
+    
+    <view class="result-content">
+      <text class="result-text">{{testResult || '暂无测试结果'}}</text>
+    </view>
+    
+    <t-button 
+      theme="default" 
+      size="medium" 
+      bind:tap="clearResult"
+      class="clear-button"
+    >
+      清空结果
+    </t-button>
+  </view>
+
+  <view class="help-section">
+    <view class="section-title">使用说明</view>
+    <view class="help-content">
+      <text class="help-text">1. 先测试基础云函数，确保云开发环境正常</text>
+      <text class="help-text">2. 测试云存储权限，确保有上传权限</text>
+      <text class="help-text">3. 选择图片进行上传测试</text>
+      <text class="help-text">4. 查看控制台日志获取详细信息</text>
+    </view>
+  </view>
+</view>
+

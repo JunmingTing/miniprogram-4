@@ -21,7 +21,8 @@ Page({
       openId: ''
     } as UserInfo,
     hasRejectedPosts: false,
-    showLogoutDialog: false
+    showLogoutDialog: false,
+    showAvatarDialog: false
   },
 
   onLoad() {
@@ -47,12 +48,18 @@ Page({
     // 页面显示时检查登录状态和帖子状态
     this.checkLoginStatus();
     this.checkRejectedPosts();
+    
+    // 调试：显示当前用户信息
+    console.log('Profile页面显示，当前用户信息:', this.data.userInfo);
+    console.log('用户头像URL:', this.data.userInfo.avatar);
   },
 
   // 检查登录状态
   checkLoginStatus() {
     const userInfo = wx.getStorageSync('userInfo');
     if (userInfo) {
+      console.log('从本地存储获取的用户信息:', userInfo);
+      console.log('用户头像URL:', userInfo.avatar);
       this.setData({
         isLoggedIn: true,
         userInfo: userInfo
@@ -177,24 +184,26 @@ Page({
 
   // 点击头像设置
   onAvatarTap() {
-    if (!this.data.isLoggedIn) return;
+    console.log('=== 头像点击事件触发 ===');
+    console.log('用户登录状态:', this.data.isLoggedIn);
+    console.log('用户信息:', this.data.userInfo);
     
-    wx.chooseMedia({
-      count: 1,
-      mediaType: ['image'],
-      sourceType: ['album', 'camera'],
-      success: (res) => {
-        const tempFilePath = res.tempFiles[0].tempFilePath;
-        this.uploadAvatar(tempFilePath);
-      },
-      fail: (err) => {
-        console.error('选择头像失败:', err);
-        wx.showToast({
-          title: '选择头像失败',
-          icon: 'error'
-        });
-      }
+    if (!this.data.isLoggedIn) {
+      console.log('用户未登录，不显示头像设置弹窗');
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    console.log('显示头像上传弹窗');
+    // 显示自定义头像上传弹窗
+    this.setData({
+      showAvatarDialog: true
     });
+    
+    console.log('弹窗状态已设置为true');
   },
 
   // 点击昵称设置
@@ -213,31 +222,58 @@ Page({
     });
   },
 
-  // 上传头像
-  uploadAvatar(filePath: string) {
-    wx.showLoading({
-      title: '上传中...'
+  // 头像上传弹窗关闭
+  onAvatarDialogClose() {
+    this.setData({
+      showAvatarDialog: false
     });
+  },
 
-    wx.cloud.uploadFile({
-      cloudPath: `avatars/${this.data.userInfo._id}_${Date.now()}.jpg`,
-      filePath: filePath,
-      success: (res) => {
-        this.updateUserInfo({ avatar: res.fileID });
-        wx.hideLoading();
-        wx.showToast({
-          title: '头像更新成功',
-          icon: 'success'
-        });
-      },
-      fail: (err) => {
-        console.error('上传头像失败:', err);
-        wx.hideLoading();
-        wx.showToast({
-          title: '上传失败',
-          icon: 'error'
-        });
-      }
+  // 头像上传成功
+  onAvatarUploadSuccess(e: any) {
+    console.log('=== 收到头像上传成功事件 ===');
+    console.log('事件详情:', e.detail);
+    const { fileID, cloudPath } = e.detail;
+    
+    if (!fileID) {
+      console.error('fileID为空，无法更新头像');
+      wx.showToast({
+        title: '头像更新失败',
+        icon: 'error'
+      });
+      return;
+    }
+    
+    console.log('开始更新头像，fileID:', fileID);
+    console.log('云存储路径:', cloudPath);
+    console.log('当前用户信息:', this.data.userInfo);
+    
+    // 立即更新界面显示 - 添加时间戳参数避免缓存
+    const newUserInfo = {
+      ...this.data.userInfo,
+      avatar: fileID + '?v=' + new Date().getTime()
+    };
+    
+    console.log('准备更新界面，新用户信息:', newUserInfo);
+    
+    this.setData({
+      userInfo: newUserInfo,
+      showAvatarDialog: false
+    });
+    
+    console.log('界面已更新，新头像:', fileID);
+    console.log('更新后的用户信息:', this.data.userInfo);
+
+    // 更新本地存储
+    wx.setStorageSync('userInfo', newUserInfo);
+    console.log('本地存储已更新');
+
+    // 更新数据库中的用户信息
+    this.updateUserInfo({ avatar: fileID });
+    
+    wx.showToast({
+      title: '头像更新成功',
+      icon: 'success'
     });
   },
 
@@ -260,6 +296,9 @@ Page({
 
   // 更新用户信息
   updateUserInfo(updateData: { nickName?: string; avatar?: string }) {
+    console.log('开始更新用户信息:', updateData);
+    console.log('用户ID:', this.data.userInfo._id);
+    
     wx.cloud.callFunction({
       name: 'updateUserInfo',
       data: {
@@ -267,12 +306,18 @@ Page({
         ...updateData
       },
       success: (res: any) => {
+        console.log('云函数调用成功:', res);
+        
         if (res.result && res.result.success) {
+          console.log('数据库更新成功');
+          
           // 更新本地数据
           const newUserInfo = {
             ...this.data.userInfo,
             ...updateData
           };
+          
+          console.log('新的用户信息:', newUserInfo);
           
           this.setData({
             userInfo: newUserInfo
@@ -280,13 +325,19 @@ Page({
           
           // 更新本地存储
           wx.setStorageSync('userInfo', newUserInfo);
+          console.log('本地存储已更新');
           
           wx.hideLoading();
-          wx.showToast({
-            title: '更新成功',
-            icon: 'success'
-          });
+          
+          // 如果是头像更新，不显示额外的成功提示（因为组件已经显示了）
+          if (!updateData.avatar) {
+            wx.showToast({
+              title: '更新成功',
+              icon: 'success'
+            });
+          }
         } else {
+          console.error('数据库更新失败:', res.result);
           wx.hideLoading();
           wx.showToast({
             title: res.result?.message || '更新失败',
@@ -295,7 +346,7 @@ Page({
         }
       },
       fail: (err) => {
-        console.error('更新用户信息失败:', err);
+        console.error('云函数调用失败:', err);
         wx.hideLoading();
         wx.showToast({
           title: '更新失败',
@@ -344,27 +395,58 @@ Page({
     });
   },
 
+  // 跳转到上传测试页面
+  onTestUploadTap() {
+    wx.navigateTo({
+      url: '/pages/test-upload/test-upload'
+    });
+  },
+
   // 测试云函数
   onTestCloudFunction() {
     wx.showLoading({
       title: '测试中...'
     });
     
+    // 先测试基础云函数
     wx.cloud.callFunction({
       name: 'test',
       success: (res: any) => {
-        console.log('测试云函数结果:', res);
-        wx.hideLoading();
-        const result = res.result || {};
-        wx.showModal({
-          title: '云函数测试结果',
-          content: `成功: ${result.success || false}\n消息: ${result.message || '无消息'}\n时间: ${result.timestamp || '无时间'}`,
-          showCancel: false,
-          confirmText: '知道了'
+        console.log('基础云函数测试结果:', res);
+        
+        // 再测试云存储权限
+        wx.cloud.callFunction({
+          name: 'checkStorage',
+          data: { action: 'checkPermission' },
+          success: (storageRes: any) => {
+            console.log('云存储权限测试结果:', storageRes);
+            wx.hideLoading();
+            
+            const testResult = res.result || {};
+            const storageResult = storageRes.result || {};
+            
+            wx.showModal({
+              title: '云开发环境测试',
+              content: `基础云函数: ${testResult.success ? '正常' : '异常'}\n云存储权限: ${storageResult.success ? '正常' : '异常'}\n\n基础消息: ${testResult.message || '无'}\n存储消息: ${storageResult.message || '无'}`,
+              showCancel: false,
+              confirmText: '知道了'
+            });
+          },
+          fail: (storageErr) => {
+            console.error('云存储权限测试失败:', storageErr);
+            wx.hideLoading();
+            const testResult = res.result || {};
+            wx.showModal({
+              title: '云开发环境测试',
+              content: `基础云函数: ${testResult.success ? '正常' : '异常'}\n云存储权限: 测试失败\n\n基础消息: ${testResult.message || '无'}\n存储错误: ${storageErr.errMsg || '未知错误'}`,
+              showCancel: false,
+              confirmText: '知道了'
+            });
+          }
         });
       },
       fail: (err) => {
-        console.error('测试云函数失败:', err);
+        console.error('基础云函数测试失败:', err);
         wx.hideLoading();
         wx.showModal({
           title: '云函数测试失败',

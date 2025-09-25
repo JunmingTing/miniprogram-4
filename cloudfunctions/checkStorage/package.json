@@ -1,0 +1,10 @@
+{
+  "name": "checkStorage",
+  "version": "1.0.0",
+  "description": "检查云存储权限",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
+

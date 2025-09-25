@@ -1,0 +1,105 @@
+<!-- 头像上传弹窗组件 -->
+<t-popup
+  visible="{{visible}}"
+  placement="center"
+  bind:visible-change="onVisibleChange"
+  close-on-click-overlay="{{false}}"
+>
+  <view class="avatar-upload-dialog">
+    <!-- 弹窗标题 -->
+    <view class="dialog-header">
+      <text class="dialog-title">设置头像</text>
+      <t-icon name="close" size="40rpx" color="#999" bind:tap="onClose" />
+    </view>
+
+    <!-- 当前头像预览 -->
+    <view class="current-avatar-section">
+      <text class="section-title">当前头像</text>
+      <view class="current-avatar-container">
+        <t-avatar 
+          src="{{currentAvatar}}" 
+          size="120rpx"
+          class="current-avatar"
+        />
+        <text class="avatar-tip" wx:if="{{!currentAvatar}}">暂无头像</text>
+      </view>
+    </view>
+
+    <!-- 选择新头像 -->
+    <view class="new-avatar-section">
+      <text class="section-title">选择新头像</text>
+      
+      <!-- 预览选中的图片 -->
+      <view class="selected-image-container" wx:if="{{selectedImage}}">
+        <image 
+          src="{{selectedImage}}" 
+          class="selected-image"
+          mode="aspectFill"
+        />
+        <view class="image-actions">
+          <t-button 
+            size="small" 
+            variant="outline" 
+            bind:tap="onReselect"
+          >
+            重新选择
+          </t-button>
+          <t-button 
+            size="small" 
+            theme="primary" 
+            bind:tap="onConfirmUpload"
+            loading="{{isUploading}}"
+          >
+            {{isUploading ? '上传中...' : '确认上传'}}
+          </t-button>
+        </view>
+      </view>
+
+      <!-- 选择按钮 -->
+      <view class="select-buttons" wx:else>
+        <t-button 
+          theme="primary" 
+          variant="outline" 
+          size="large" 
+          icon="camera"
+          bind:tap="onTakePhoto"
+          class="select-btn"
+        >
+          拍照
+        </t-button>
+        <t-button 
+          theme="primary" 
+          variant="outline" 
+          size="large" 
+          icon="image"
+          bind:tap="onChooseFromAlbum"
+          class="select-btn"
+        >
+          从相册选择
+        </t-button>
+      </view>
+    </view>
+
+    <!-- 上传进度 -->
+    <view class="upload-progress" wx:if="{{isUploading}}">
+      <text class="progress-text">{{uploadProgress}}</text>
+      <t-progress 
+        percentage="{{uploadPercent}}" 
+        size="medium"
+        class="progress-bar"
+      />
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="dialog-actions">
+      <t-button 
+        size="large" 
+        variant="outline" 
+        bind:tap="onClose"
+        class="action-btn"
+      >
+        取消
+      </t-button>
+    </view>
+  </view>
+</t-popup>

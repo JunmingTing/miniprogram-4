@@ -7,7 +7,8 @@
     "t-badge": "tdesign-miniprogram/badge/badge",
     "t-button": "tdesign-miniprogram/button/button",
     "t-dialog": "tdesign-miniprogram/dialog/dialog",
-    "t-toast": "tdesign-miniprogram/toast/toast"
+    "t-toast": "tdesign-miniprogram/toast/toast",
+    "avatar-upload-dialog": "/components/avatar-upload-dialog/avatar-upload-dialog"
   },
   "navigationBarTitleText": "我的"
 }
