@@ -5,6 +5,7 @@ Page({
     tempImages: [] as string[], // 存储临时文件路径用于预览
     tags: [] as string[],
     tagInput: '',
+    tagInputDisabled: true, // 标签输入按钮是否禁用
     publishing: false,
     uploading: false,
     uploadProgress: 0
@@ -96,7 +97,7 @@ Page({
           return;
         }
 
-        // 先显示预览
+        // 先显示预览，不立即上传
         const tempFilePaths = tempFiles.map(file => file.tempFilePath);
         const newTempImages = [...this.data.tempImages, ...tempFilePaths];
         
@@ -107,22 +108,6 @@ Page({
         wx.showToast({
           title: `已选择${tempFilePaths.length}张图片`,
           icon: 'success'
-        });
-
-        // 显示上传选项
-        wx.showModal({
-          title: '上传图片',
-          content: `已选择${tempFilePaths.length}张图片，是否立即上传到云存储？`,
-          success: (res) => {
-            if (res.confirm) {
-              this.uploadImages(tempFilePaths);
-            } else {
-              wx.showToast({
-                title: '图片已保存，可稍后手动上传',
-                icon: 'none'
-              });
-            }
-          }
         });
       },
       fail: (err) => {
@@ -268,27 +253,6 @@ Page({
     });
   },
 
-  // 手动上传图片
-  onManualUpload() {
-    const pendingImages = this.data.tempImages.slice(this.data.images.length);
-    if (pendingImages.length === 0) {
-      wx.showToast({
-        title: '没有待上传的图片',
-        icon: 'none'
-      });
-      return;
-    }
-
-    wx.showModal({
-      title: '确认上传',
-      content: `有${pendingImages.length}张图片待上传，是否继续？`,
-      success: (res) => {
-        if (res.confirm) {
-          this.uploadImages(pendingImages);
-        }
-      }
-    });
-  },
 
   // 重试失败的上传
   retryFailedUploads(failedUploads: { index: number, error: any }[], tempFilePaths: string[]) {
@@ -317,143 +281,14 @@ Page({
     });
   },
 
-  // 设置头像
-  onSetAvatar(e: any) {
-    const index = e.currentTarget.dataset.index;
-    const imageFileID = this.data.images[index];
-    
-    if (!imageFileID) {
-      wx.showToast({
-        title: '图片未上传完成',
-        icon: 'error'
-      });
-      return;
-    }
-
-    wx.showModal({
-      title: '设置头像',
-      content: '确定要将这张图片设为头像吗？',
-      success: (res) => {
-        if (res.confirm) {
-          this.updateUserAvatar(imageFileID);
-        }
-      }
-    });
-  },
-
-  // 更新用户头像
-  updateUserAvatar(avatarFileID: string) {
-    wx.showLoading({
-      title: '正在设置头像...'
-    });
-
-    // 获取用户信息
-    wx.cloud.callFunction({
-      name: 'login',
-      success: (loginRes) => {
-        const userInfo = loginRes.result as any;
-        
-        // 保存旧头像URL用于后续删除
-        const oldAvatar = userInfo.userInfo?.avatarUrl || '';
-        console.log('publish页面 - 旧头像URL:', oldAvatar);
-        
-        // 更新数据库中的用户头像
-        (wx.cloud.database().collection('users').where({
-          openid: userInfo.openid
-        }) as any).update({
-          data: {
-            avatar: avatarFileID,
-            updateTime: new Date()
-          },
-          success: (updateRes: any) => {
-            console.log('头像更新成功:', updateRes);
-            
-            // 更新本地存储
-            const newUserInfo = {
-              ...userInfo,
-              avatar: avatarFileID
-            };
-            wx.setStorageSync('userInfo', newUserInfo);
-            
-            wx.hideLoading();
-            wx.showToast({
-              title: '头像设置成功',
-              icon: 'success'
-            });
-
-            // 如果有旧头像，删除旧头像
-            if (oldAvatar && oldAvatar.trim() !== '') {
-              this.deleteOldAvatar(oldAvatar);
-            }
-
-            // 触发全局事件，通知其他页面更新头像
-            if ((wx as any).eventBus && (wx as any).eventBus.emit) {
-              (wx as any).eventBus.emit('avatarUpdated', { avatar: avatarFileID });
-            }
-          },
-          fail: (err: any) => {
-            console.error('头像更新失败:', err);
-            wx.hideLoading();
-            wx.showToast({
-              title: '头像设置失败',
-              icon: 'error'
-            });
-          }
-        });
-      },
-      fail: (err) => {
-        console.error('获取用户信息失败:', err);
-        wx.hideLoading();
-        wx.showToast({
-          title: '获取用户信息失败',
-          icon: 'error'
-        });
-      }
-    });
-  },
-
-  // 删除旧头像
-  deleteOldAvatar(oldAvatar: string) {
-    console.log('=== publish页面 - 开始删除旧头像 ===');
-    console.log('旧头像URL:', oldAvatar);
-    
-    // 检查是否是有效的云存储fileID
-    if (!oldAvatar || !oldAvatar.startsWith('cloud://')) {
-      console.log('旧头像不是云存储文件，跳过删除');
-      return;
-    }
-    
-    // 移除URL参数（如?v=1234567890）
-    const cleanFileID = oldAvatar.split('?')[0];
-    console.log('清理后的fileID:', cleanFileID);
-    
-    wx.cloud.callFunction({
-      name: 'deleteFile',
-      data: {
-        fileList: [cleanFileID]
-      },
-      success: (res: any) => {
-        console.log('publish页面 - 删除旧头像云函数调用成功:', res);
-        
-        if (res.result && res.result.success) {
-          console.log('publish页面 - 旧头像删除成功，删除数量:', res.result.deletedCount);
-          if (res.result.failedCount > 0) {
-            console.warn('publish页面 - 部分文件删除失败，失败数量:', res.result.failedCount);
-            console.warn('删除详情:', res.result.details);
-          }
-        } else {
-          console.error('publish页面 - 旧头像删除失败:', res.result);
-        }
-      },
-      fail: (err) => {
-        console.error('publish页面 - 删除旧头像云函数调用失败:', err);
-      }
-    });
-  },
 
   // 标签输入变化
   onTagInputChange(e: any) {
-    this.setData({ tagInput: e.detail.value });
+    const value = e.detail.value;
+    this.setData({ 
+      tagInput: value,
+      tagInputDisabled: !value || value.trim() === ''
+    });
   },
 
   // 添加标签
@@ -488,7 +323,8 @@ Page({
     
     this.setData({
       tags,
-      tagInput: ''
+      tagInput: '',
+      tagInputDisabled: true
     });
 
     wx.showToast({
@@ -512,7 +348,7 @@ Page({
 
   // 发布帖子
   onPublish() {
-    if (this.data.images.length === 0) {
+    if (this.data.tempImages.length === 0) {
       wx.showToast({
         title: '请至少选择一张图片',
         icon: 'none'
@@ -520,15 +356,127 @@ Page({
       return;
     }
 
-    if (this.data.uploading) {
+    if (this.data.uploading || this.data.publishing) {
       wx.showToast({
-        title: '图片正在上传中，请稍候',
+        title: '正在处理中，请稍候',
         icon: 'none'
       });
       return;
     }
 
     this.setData({ publishing: true });
+
+    // 先上传图片到云存储
+    const pendingImages = this.data.tempImages.slice(this.data.images.length);
+    console.log('开始上传图片:', pendingImages);
+
+    this.uploadImagesForPublish(pendingImages);
+  },
+
+  // 为发布上传图片
+  uploadImagesForPublish(tempFilePaths: string[]) {
+    if (tempFilePaths.length === 0) {
+      // 没有新图片需要上传，直接发布
+      this.publishPost();
+      return;
+    }
+
+    console.log('开始上传图片到云存储:', tempFilePaths);
+    this.setData({ uploading: true });
+
+    const uploadPromises = tempFilePaths.map((tempFilePath, index) => {
+      return new Promise<string>((resolve, reject) => {
+        const fileName = `posts/${Date.now()}_${index}.jpg`;
+        
+        wx.cloud.uploadFile({
+          cloudPath: fileName,
+          filePath: tempFilePath,
+          success: (res) => {
+            console.log(`图片${index + 1}上传成功:`, res.fileID);
+            resolve(res.fileID);
+          },
+          fail: (err: any) => {
+            console.error(`图片${index + 1}上传失败:`, err);
+            reject(err);
+          }
+        });
+      });
+    });
+
+    Promise.allSettled(uploadPromises).then((results) => {
+      const successfulUploads: string[] = [];
+      const failedUploads: { index: number, error: any }[] = [];
+
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          successfulUploads.push(result.value);
+        } else {
+          failedUploads.push({ index, error: result.reason });
+        }
+      });
+
+      console.log('上传结果:', {
+        total: tempFilePaths.length,
+        successful: successfulUploads.length,
+        failed: failedUploads.length
+      });
+
+      // 更新已上传的图片列表
+      const newImages = [...this.data.images, ...successfulUploads];
+      this.setData({
+        images: newImages,
+        uploading: false
+      });
+
+      if (successfulUploads.length === tempFilePaths.length) {
+        // 所有图片上传成功，发布帖子
+        this.publishPost();
+      } else if (successfulUploads.length > 0) {
+        // 部分图片上传成功，询问是否继续
+        wx.showModal({
+          title: '部分图片上传失败',
+          content: `成功上传${successfulUploads.length}张，失败${failedUploads.length}张。是否继续发布？`,
+          success: (res) => {
+            if (res.confirm) {
+              this.publishPost();
+            } else {
+              this.setData({ publishing: false });
+            }
+          }
+        });
+      } else {
+        // 所有图片上传失败
+        wx.showModal({
+          title: '图片上传失败',
+          content: '所有图片上传失败，请检查网络连接后重试',
+          showCancel: false,
+          success: () => {
+            this.setData({ publishing: false });
+          }
+        });
+      }
+    });
+  },
+
+  // 发布帖子到数据库
+  publishPost() {
+    console.log('开始发布帖子，当前数据:', {
+      images: this.data.images,
+      tags: this.data.tags,
+      imagesLength: this.data.images.length,
+      tempImagesLength: this.data.tempImages.length
+    });
+
+    // 检查云开发环境
+    if (!wx.cloud) {
+      console.error('云开发环境未初始化');
+      wx.showToast({
+        title: '云开发环境未初始化',
+        icon: 'error'
+      });
+      this.setData({ publishing: false });
+      return;
+    }
 
     // 获取用户信息
     wx.cloud.callFunction({
@@ -541,9 +489,9 @@ Page({
         const postData = {
           images: this.data.images,
           tags: this.data.tags,
-          authorId: userInfo.openid,
-          authorName: userInfo.nickName || '匿名用户',
-          authorAvatar: userInfo.avatarUrl || '',
+          authorId: userInfo.openId,
+          authorName: userInfo.userInfo?.nickName || '匿名用户',
+          authorAvatar: userInfo.userInfo?.avatarUrl || '',
           createTime: new Date(),
           likeCount: 0,
           commentCount: 0,
@@ -562,15 +510,41 @@ Page({
               icon: 'success'
             });
 
-            // 发布成功后返回社区页面
+            // 发布成功后返回社区页面并刷新数据
             setTimeout(() => {
+              // 获取页面栈
+              const pages = getCurrentPages();
+              const prevPage = pages[pages.length - 2]; // 上一个页面
+              
+              // 如果上一个页面是社区页面，刷新数据
+              if (prevPage && prevPage.route === 'pages/community/community') {
+                if (prevPage.loadPostsFromCloud) {
+                  prevPage.loadPostsFromCloud();
+                }
+              }
+              
               wx.navigateBack();
             }, 1500);
           },
           fail: (err) => {
             console.error('帖子发布失败:', err);
+            console.error('错误详情:', {
+              errCode: err.errCode,
+              errMsg: err.errMsg,
+              postData: postData
+            });
+            
+            let errorMessage = '发布失败，请重试';
+            if (err.errCode === -1) {
+              errorMessage = '网络错误，请检查网络连接';
+            } else if (err.errCode === -502002) {
+              errorMessage = '数据库权限不足，请联系管理员';
+            } else if (err.errMsg && err.errMsg.includes('collection')) {
+              errorMessage = '数据库集合不存在，请联系管理员';
+            }
+            
             wx.showToast({
-              title: '发布失败，请重试',
+              title: errorMessage,
               icon: 'error'
             });
           },

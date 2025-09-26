@@ -8,7 +8,7 @@
 /* 固定发布按钮 */
 .fixed-publish-btn {
   position: fixed;
-  top: 100rpx;
+  bottom: 100rpx;
   right: 30rpx;
   width: 100rpx;
   height: 100rpx;
@@ -39,79 +39,82 @@
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
 }
 
-/* 帖子头部 */
-.post-header {
-  display: flex;
-  align-items: center;
-  padding: 30rpx;
-}
-
-.author-avatar-container {
-  margin-right: 20rpx;
-  position: relative;
-}
-
-.author-avatar {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
-  background-color: #f0f0f0;
-}
-
-.author-avatar-placeholder {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
-  background-color: #f0f0f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.author-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.author-name {
-  font-size: 28rpx;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 8rpx;
-}
-
-.post-time {
-  font-size: 24rpx;
-  color: #999;
-}
 
 /* 帖子图片 */
 .post-images {
   position: relative;
+  padding: 20rpx;
 }
 
 .post-swiper {
   width: 100%;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.image-container {
+  width: 100%;
+  height: 400rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  background-color: #f0f0f0;
 }
 
 .post-image {
   width: 100%;
   height: 400rpx;
+  border-radius: 16rpx;
+  transition: transform 0.3s ease;
+  background-color: #f0f0f0;
+}
+
+.post-image:active {
+  transform: scale(0.98);
 }
 
 .image-indicator {
   position: absolute;
-  bottom: 20rpx;
-  right: 20rpx;
+  bottom: 40rpx;
+  right: 40rpx;
   background-color: rgba(0, 0, 0, 0.6);
   color: #fff;
   padding: 8rpx 16rpx;
   border-radius: 20rpx;
+  backdrop-filter: blur(10rpx);
 }
 
 .indicator-text {
   font-size: 20rpx;
+}
+
+/* 滑动提示 */
+.swipe-hint {
+  position: absolute;
+  top: 20rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  backdrop-filter: blur(10rpx);
+  animation: fadeInOut 3s ease-in-out;
+}
+
+.hint-text {
+  font-size: 18rpx;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 /* 操作按钮 */
@@ -148,6 +151,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: 16rpx;
+  align-items: center;
+  position: relative;
 }
 
 .tag-item {
@@ -160,6 +165,32 @@
 
 .post-tag:active {
   transform: scale(0.95);
+}
+
+/* 添加标签按钮 */
+.add-tag-btn {
+  position: absolute;
+  bottom: 10rpx;
+  right: 30rpx;
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 8rpx 16rpx;
+  border: 1rpx dashed #ccc;
+  border-radius: 16rpx;
+  background-color: #fafafa;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.add-tag-btn:active {
+  background-color: #f0f0f0;
+  transform: scale(0.95);
+}
+
+.add-tag-text {
+  font-size: 18rpx;
+  color: #999;
 }
 
 /* 加载更多 */
@@ -176,20 +207,6 @@
   margin-top: 20rpx;
 }
 
-/* 标签输入对话框 */
-.tag-input-container {
-  padding: 20rpx 0;
-}
-
-.tag-input {
-  width: 100%;
-  height: 80rpx;
-  border: 1rpx solid #e5e5e5;
-  border-radius: 8rpx;
-  padding: 0 20rpx;
-  font-size: 28rpx;
-  background-color: #fff;
-}
 
 /* 举报选项 */
 .report-options {

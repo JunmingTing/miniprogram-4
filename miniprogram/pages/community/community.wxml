@@ -8,24 +8,6 @@
   <!-- 帖子列表 -->
   <view class="posts-list">
     <view class="post-item" wx:for="{{posts}}" wx:key="id" bind:tap="onPostTap" data-post="{{item}}">
-      <!-- 用户信息 -->
-      <view class="post-header">
-        <view class="author-avatar-container">
-          <image 
-            src="{{item.author.avatar}}" 
-            class="author-avatar"
-            mode="aspectFill"
-            wx:if="{{item.author.avatar}}"
-          />
-          <view class="author-avatar-placeholder" wx:else>
-            <t-icon name="user" size="40rpx" color="#ccc" />
-          </view>
-        </view>
-        <view class="author-info">
-          <text class="author-name">{{item.author.name}}</text>
-          <text class="post-time">{{item.time}}</text>
-        </view>
-      </view>
 
       <!-- 图片轮播 -->
       <view class="post-images" wx:if="{{item.images.length > 0}}">
@@ -34,15 +16,20 @@
           bind:change="onImageChange"
           data-post-id="{{item.id}}"
           class="post-swiper"
+          autoplay="{{false}}"
+          interval="0"
+          duration="300"
         >
           <t-swiper-item wx:for="{{item.images}}" wx:key="index" wx:for-item="image">
-            <t-image 
-              src="{{image}}" 
-              class="post-image"
-              mode="aspectFill"
-              width="100%"
-              height="400rpx"
-            />
+            <view class="image-container">
+              <t-image 
+                src="{{image}}" 
+                class="post-image"
+                mode="aspectFill"
+                width="100%"
+                height="400rpx"
+              />
+            </view>
           </t-swiper-item>
         </t-swiper>
         
@@ -50,18 +37,30 @@
         <view class="image-indicator" wx:if="{{item.images.length > 1}}">
           <text class="indicator-text">{{item.currentImageIndex + 1}}/{{item.images.length}}</text>
         </view>
+        
+        <!-- 滑动提示 -->
+        <view class="swipe-hint" wx:if="{{item.images.length > 1}}">
+          <t-icon name="chevron-left" size="24rpx" color="rgba(255,255,255,0.7)" />
+          <text class="hint-text">左右滑动</text>
+          <t-icon name="chevron-right" size="24rpx" color="rgba(255,255,255,0.7)" />
+        </view>
       </view>
 
       <!-- 标签区域 -->
-      <view class="post-tags" wx:if="{{item.tags.length > 0}}">
-        <view class="tag-item" wx:for="{{item.tags}}" wx:key="id" bind:tap="onTagTap" data-tag="{{item}}" catchtap="true">
+      <view class="post-tags">
+        <view class="tag-item" wx:for="{{item.tags}}" wx:key="id" catchtap="onTagTap" data-tag="{{item}}">
           <t-tag 
             theme="{{item.isLiked ? 'warning' : 'default'}}"
             size="small"
             class="post-tag"
           >
-            {{item.text}} {{item.likeCount}}
+            {{item.text}}
           </t-tag>
+        </view>
+        <!-- 添加标签按钮 -->
+        <view class="add-tag-btn" catchtap="onAddTagTap" data-id="{{item.id}}">
+          <t-icon name="add" size="24rpx" color="#999" />
+          <text class="add-tag-text">添加标签</text>
         </view>
       </view>
     </view>
@@ -80,25 +79,6 @@
   />
 </view>
 
-<!-- 添加标签对话框 -->
-<t-dialog
-  visible="{{showTagDialog}}"
-  title="添加标签"
-  content="请输入标签内容（最多12字）"
-  bind:confirm="onTagConfirm"
-  bind:cancel="onTagCancel"
->
-  <view class="tag-input-container">
-    <input 
-      class="tag-input" 
-      placeholder="输入标签内容" 
-      value="{{tagText}}"
-      maxlength="12"
-      bind:input="onTagTextChange"
-      focus="{{showTagDialog}}"
-    />
-  </view>
-</t-dialog>
 
 
 <!-- Toast提示 -->

@@ -24,6 +24,7 @@
   position: relative;
   width: 160rpx;
   height: 160rpx;
+  margin-bottom: 60rpx;
 }
 
 .uploaded-image {
@@ -46,19 +47,6 @@
   box-shadow: 0 2rpx 8rpx rgba(255, 77, 79, 0.3);
 }
 
-.set-avatar-btn {
-  position: absolute;
-  bottom: -10rpx;
-  right: -10rpx;
-  width: 40rpx;
-  height: 40rpx;
-  background-color: #4F46E5;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2rpx 8rpx rgba(79, 70, 229, 0.3);
-}
 
 .upload-status {
   position: absolute;
@@ -107,36 +95,8 @@
   color: #999;
 }
 
-.avatar-tip {
-  font-size: 24rpx;
-  color: #4F46E5;
-  margin-top: 10rpx;
-  display: block;
-}
 
-.manual-upload-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20rpx;
-  padding: 20rpx 40rpx;
-  background-color: #f8f9ff;
-  border: 2rpx dashed #4F46E5;
-  border-radius: 12rpx;
-  transition: all 0.3s ease;
-}
 
-.manual-upload-btn:active {
-  background-color: #e8ebff;
-  transform: scale(0.98);
-}
-
-.upload-btn-text {
-  margin-left: 10rpx;
-  font-size: 28rpx;
-  color: #4F46E5;
-  font-weight: 500;
-}
 
 /* 标签管理区域 */
 .tags-section {
@@ -162,6 +122,13 @@
 
 .tag-item {
   margin-bottom: 16rpx;
+}
+
+/* 自定义标签样式 - 灰色背景 */
+.tag-item .t-tag {
+  background-color: #f0f0f0 !important;
+  color: #666 !important;
+  border-color: #e0e0e0 !important;
 }
 
 .tag-input-container {

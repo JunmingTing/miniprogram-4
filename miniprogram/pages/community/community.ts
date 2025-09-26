@@ -33,9 +33,6 @@ Page({
     loading: false,
     page: 1,
     hasMore: true,
-    showTagDialog: false,
-    tagText: '',
-    currentPostId: '',
     userInfo: {
       nickName: '',
       avatar: '',
@@ -78,70 +75,87 @@ Page({
   loadPosts() {
     this.setData({ loading: true });
 
-    // 获取用户信息作为作者信息
-    const userInfo = this.data.userInfo;
-    const authorInfo = {
-      name: userInfo.nickName || '我的精彩时刻',
-      avatar: userInfo.avatar || 'https://via.placeholder.com/80x80/4F46E5/FFFFFF?text=我'
-    };
-
-    // 模拟数据 - 所有帖子都使用用户本人的信息
-    const mockPosts: Post[] = [
-      {
-        id: '1',
-        author: authorInfo,
-        time: '2024-01-15 16:30',
-        images: [
-          'https://via.placeholder.com/750x400/4F46E5/FFFFFF?text=游戏截图1',
-          'https://via.placeholder.com/750x400/10B981/FFFFFF?text=游戏截图2',
-          'https://via.placeholder.com/750x400/F59E0B/FFFFFF?text=游戏截图3'
-        ],
-        currentImageIndex: 0,
-        tags: [
-          { id: '1', text: '原神', likeCount: 12, isLiked: false },
-          { id: '2', text: '角色', likeCount: 8, isLiked: false },
-          { id: '3', text: '攻略', likeCount: 5, isLiked: false }
-        ]
-      },
-      {
-        id: '2',
-        author: authorInfo,
-        time: '2024-01-15 15:45',
-        images: [
-          'https://via.placeholder.com/750x400/EF4444/FFFFFF?text=电竞截图1',
-          'https://via.placeholder.com/750x400/8B5CF6/FFFFFF?text=电竞截图2'
-        ],
-        currentImageIndex: 0,
-        tags: [
-          { id: '4', text: 'LOL', likeCount: 15, isLiked: false },
-          { id: '5', text: '电竞', likeCount: 9, isLiked: false }
-        ]
-      },
-      {
-        id: '3',
-        author: authorInfo,
-        time: '2024-01-15 14:20',
-        images: [
-          'https://via.placeholder.com/750x400/8B5CF6/FFFFFF?text=游戏截图1',
-          'https://via.placeholder.com/750x400/EC4899/FFFFFF?text=游戏截图2',
-          'https://via.placeholder.com/750x400/06B6D4/FFFFFF?text=游戏截图3',
-          'https://via.placeholder.com/750x400/84CC16/FFFFFF?text=游戏截图4'
-        ],
-        currentImageIndex: 0,
-        tags: [
-          { id: '6', text: '手游', likeCount: 6, isLiked: false },
-          { id: '7', text: '攻略', likeCount: 3, isLiked: false }
-        ]
-      }
-    ];
-
-    this.setData({
-      posts: mockPosts,
-      loading: false
-    });
+    // 从云数据库加载真实的帖子数据
+    this.loadPostsFromCloud();
 
     // 停止下拉刷新
     wx.stopPullDownRefresh();
+  },
+
+  // 从云数据库加载帖子
+  loadPostsFromCloud() {
+    console.log('开始从云数据库加载帖子...');
+    
+    wx.cloud.database().collection('posts')
+      .orderBy('createTime', 'desc')
+      .limit(10)
+      .get()
+      .then((res: any) => {
+        console.log('从云数据库加载帖子成功:', res);
+        
+        const posts: Post[] = res.data.map((item: any) => ({
+          id: item._id,
+          author: {
+            name: '',
+            avatar: ''
+          },
+          time: this.formatTime(item.createTime),
+          images: item.images || [],
+          currentImageIndex: 0,
+          tags: (item.tags || []).map((tag: string, index: number) => ({
+            id: `${item._id}_tag_${index}`,
+            text: tag,
+            likeCount: 0,
+            isLiked: false
+          }))
+        }));
+
+        this.setData({
+          posts,
+          loading: false
+        });
+
+        // 停止下拉刷新
+        wx.stopPullDownRefresh();
+      })
+      .catch((err: any) => {
+        console.error('从云数据库加载帖子失败:', err);
+        this.setData({
+          posts: [],
+          loading: false
+        });
+        
+        // 停止下拉刷新
+        wx.stopPullDownRefresh();
+        
+        wx.showToast({
+          title: '加载失败，请重试',
+          icon: 'none'
+        });
+      });
+  },
+
+  // 格式化时间
+  formatTime(date: Date): string {
+    const now = new Date();
+    const postDate = new Date(date);
+    const diff = now.getTime() - postDate.getTime();
+    
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    
+    if (minutes < 1) {
+      return '刚刚';
+    } else if (minutes < 60) {
+      return `${minutes}分钟前`;
+    } else if (hours < 24) {
+      return `${hours}小时前`;
+    } else if (days < 7) {
+      return `${days}天前`;
+    } else {
+      return postDate.toLocaleDateString();
+    }
   },
 
   // 刷新数据
@@ -160,37 +174,59 @@ Page({
 
     this.setData({ loading: true });
 
-    // 获取用户信息作为作者信息
-    const userInfo = this.data.userInfo;
-    const authorInfo = {
-      name: userInfo.nickName || '我的精彩时刻',
-      avatar: userInfo.avatar || 'https://via.placeholder.com/80x80/4F46E5/FFFFFF?text=我'
-    };
-
-    // 模拟加载更多数据 - 所有帖子都使用用户本人的信息
-    setTimeout(() => {
-      const morePosts: Post[] = [
-        {
-          id: `${this.data.page + 1}_1`,
-          author: authorInfo,
-          time: '2024-01-14 20:30',
-          images: [
-            'https://via.placeholder.com/750x400/FF6B6B/FFFFFF?text=新帖子'
-          ],
-          currentImageIndex: 0,
-          tags: [
-            { id: '8', text: '新手', likeCount: 2, isLiked: false }
-          ]
+    // 从云数据库加载更多帖子
+    const skip = this.data.posts.length;
+    
+    wx.cloud.database().collection('posts')
+      .orderBy('createTime', 'desc')
+      .skip(skip)
+      .limit(10)
+      .get()
+      .then((res: any) => {
+        console.log('加载更多帖子成功:', res);
+        
+        if (res.data.length === 0) {
+          // 没有更多数据
+          this.setData({
+            hasMore: false,
+            loading: false
+          });
+          return;
         }
-      ];
+        
+        const morePosts: Post[] = res.data.map((item: any) => ({
+          id: item._id,
+          author: {
+            name: '',
+            avatar: ''
+          },
+          time: this.formatTime(item.createTime),
+          images: item.images || [],
+          currentImageIndex: 0,
+          tags: (item.tags || []).map((tag: string, index: number) => ({
+            id: `${item._id}_tag_${index}`,
+            text: tag,
+            likeCount: 0,
+            isLiked: false
+          }))
+        }));
 
-      this.setData({
-        posts: [...this.data.posts, ...morePosts],
-        page: this.data.page + 1,
-        loading: false,
-        hasMore: this.data.page < 3 // 模拟只有3页数据
+        this.setData({
+          posts: [...this.data.posts, ...morePosts],
+          page: this.data.page + 1,
+          loading: false,
+          hasMore: res.data.length === 10 // 如果返回的数据少于10条，说明没有更多了
+        });
+      })
+      .catch((err: any) => {
+        console.error('加载更多帖子失败:', err);
+        this.setData({ loading: false });
+        
+        wx.showToast({
+          title: '加载失败，请重试',
+          icon: 'none'
+        });
       });
-    }, 1000);
   },
 
   // 图片切换
@@ -226,73 +262,75 @@ Page({
 
   // 添加标签
   onAddTagTap(e: any) {
-    const id = e.currentTarget.dataset.id;
-    this.setData({
-      showTagDialog: true,
-      currentPostId: id,
-      tagText: ''
-    });
-  },
-
-  onTagTextChange(e: any) {
-    this.setData({ tagText: e.detail.value });
-  },
-
-  onTagConfirm() {
-    if (!this.data.tagText.trim()) {
-      wx.showToast({
-        title: '请输入标签内容',
-        icon: 'none'
-      });
-      return;
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
     }
-
-    if (this.data.tagText.length > 12) {
-      wx.showToast({
-        title: '标签内容不能超过12字',
-        icon: 'none'
-      });
-      return;
-    }
-
-    // 添加标签到对应帖子
-    const posts = this.data.posts.map(post => {
-      if (post.id === this.data.currentPostId) {
-        const newTag: PostTag = {
-          id: Date.now().toString(),
-          text: this.data.tagText,
-          likeCount: 0,
-          isLiked: false
-        };
-        return {
-          ...post,
-          tags: [...post.tags, newTag]
-        };
+    const postId = e.currentTarget.dataset.id;
+    
+    wx.showModal({
+      title: '添加标签',
+      editable: true,
+      placeholderText: '请输入标签内容（最多12字）',
+      success: (res) => {
+        if (res.confirm && res.content && res.content.trim()) {
+          const tagText = res.content.trim();
+          if (tagText.length > 12) {
+            wx.showToast({
+              title: '标签内容不能超过12字',
+              icon: 'none'
+            });
+            return;
+          }
+          this.addTagToDatabase(postId, tagText);
+        }
       }
-      return post;
-    });
-
-    this.setData({ posts });
-
-    wx.showToast({
-      title: '标签添加成功',
-      icon: 'success'
-    });
-
-    this.setData({
-      showTagDialog: false,
-      tagText: '',
-      currentPostId: ''
     });
   },
 
-  onTagCancel() {
-    this.setData({
-      showTagDialog: false,
-      tagText: '',
-      currentPostId: ''
+
+  // 添加标签到数据库
+  addTagToDatabase(postId: string, tagText: string) {
+    console.log('开始添加标签到数据库:', { postId, tagText });
+    
+    wx.cloud.database().collection('posts').doc(postId).update({
+      data: {
+        tags: wx.cloud.database().command.push(tagText)
+      }
+    }).then((res: any) => {
+      console.log('标签添加到数据库成功:', res);
+      
+      // 更新本地数据
+      const posts = this.data.posts.map(post => {
+        if (post.id === postId) {
+          const newTag: PostTag = {
+            id: Date.now().toString(),
+            text: tagText,
+            likeCount: 0,
+            isLiked: false
+          };
+          return {
+            ...post,
+            tags: [...post.tags, newTag]
+          };
+        }
+        return post;
+      });
+
+      this.setData({ posts });
+
+      wx.showToast({
+        title: '标签添加成功',
+        icon: 'success'
+      });
+    }).catch((err: any) => {
+      console.error('标签添加到数据库失败:', err);
+      wx.showToast({
+        title: '添加失败，请重试',
+        icon: 'none'
+      });
     });
   },
+
 
   // 标签点击
   onTagTap(e: any) {
