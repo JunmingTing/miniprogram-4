@@ -66,16 +66,31 @@
   overflow: hidden;
 }
 
+.news-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 8rpx;
+}
+
+.news-tag {
+  font-size: 20rpx !important;
+}
+
 .news-time {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #999;
+  text-align: right;
+  margin-top: 10rpx;
 }
 
 .news-actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 40rpx;
   padding-left: 100rpx;
+  margin-top: 10rpx;
 }
 
 .action-item {

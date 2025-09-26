@@ -20,9 +20,7 @@ interface FavoritePost {
 
 Page({
   data: {
-    activeTab: 'news',
     favoriteNews: [] as FavoriteNews[],
-    favoritePosts: [] as FavoritePost[],
     loading: true
   },
 
@@ -76,56 +74,10 @@ Page({
       }
     ];
 
-    // 模拟收藏的帖子数据
-    const mockFavoritePosts: FavoritePost[] = [
-      {
-        id: '1',
-        coverImage: 'https://via.placeholder.com/200x200/4F46E5/FFFFFF?text=帖子1',
-        imageCount: 3,
-        favoriteTime: '2024-01-15 16:30'
-      },
-      {
-        id: '2',
-        coverImage: 'https://via.placeholder.com/200x200/10B981/FFFFFF?text=帖子2',
-        imageCount: 2,
-        favoriteTime: '2024-01-15 15:45'
-      },
-      {
-        id: '3',
-        coverImage: 'https://via.placeholder.com/200x200/F59E0B/FFFFFF?text=帖子3',
-        imageCount: 1,
-        favoriteTime: '2024-01-15 14:20'
-      },
-      {
-        id: '4',
-        coverImage: 'https://via.placeholder.com/200x200/EF4444/FFFFFF?text=帖子4',
-        imageCount: 4,
-        favoriteTime: '2024-01-15 13:10'
-      },
-      {
-        id: '5',
-        coverImage: 'https://via.placeholder.com/200x200/8B5CF6/FFFFFF?text=帖子5',
-        imageCount: 2,
-        favoriteTime: '2024-01-15 12:30'
-      },
-      {
-        id: '6',
-        coverImage: 'https://via.placeholder.com/200x200/EC4899/FFFFFF?text=帖子6',
-        imageCount: 1,
-        favoriteTime: '2024-01-15 11:45'
-      }
-    ];
-
     this.setData({
       favoriteNews: mockFavoriteNews,
-      favoritePosts: mockFavoritePosts,
       loading: false
     });
-  },
-
-  // 标签切换
-  onTabChange(e: any) {
-    this.setData({ activeTab: e.detail.value });
   },
 
   // 资讯点击
@@ -133,14 +85,6 @@ Page({
     const news = e.currentTarget.dataset.news;
     wx.navigateTo({
       url: `/pages/news-detail/news-detail?id=${news.id}`
-    });
-  },
-
-  // 帖子点击
-  onPostTap(e: any) {
-    const post = e.currentTarget.dataset.post;
-    wx.navigateTo({
-      url: `/pages/post-detail/post-detail?id=${post.id}`
     });
   },
 

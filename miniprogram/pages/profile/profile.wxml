@@ -38,27 +38,10 @@
   <!-- 功能菜单 -->
   <view class="menu-section">
     <t-cell-group>
-      <!-- 管理帖子 -->
-      <t-cell 
-        title="管理帖子" 
-        description="管理你发布的帖子"
-        left-icon="edit"
-        right-icon="chevron-right"
-        bind:tap="onMyPostsTap"
-        class="menu-cell"
-      >
-        <t-badge 
-          wx:if="{{hasRejectedPosts}}"
-          count="1" 
-          max-count="99"
-          slot="right-icon"
-        />
-      </t-cell>
-      
       <!-- 我的收藏 -->
       <t-cell 
         title="我的收藏" 
-        description="查看收藏的资讯和帖子"
+        description="查看收藏的资讯"
         left-icon="bookmark"
         right-icon="chevron-right"
         bind:tap="onMyFavoritesTap"
@@ -80,25 +63,6 @@
         class="menu-cell"
       />
       
-      <!-- 测试云函数 -->
-      <t-cell 
-        title="测试云函数" 
-        description="检查云开发环境"
-        left-icon="bug"
-        right-icon="chevron-right"
-        bind:tap="onTestCloudFunction"
-        class="menu-cell"
-      />
-      
-      <!-- 上传测试 -->
-      <t-cell 
-        title="上传测试" 
-        description="调试头像上传问题"
-        left-icon="upload"
-        right-icon="chevron-right"
-        bind:tap="onTestUploadTap"
-        class="menu-cell"
-      />
       
       <!-- 关于我们 -->
       <t-cell 
@@ -126,14 +90,6 @@
   </view>
 </view>
 
-<!-- 退出登录对话框 -->
-<t-dialog
-  visible="{{showLogoutDialog}}"
-  title="退出登录"
-  content="确定要退出登录吗？"
-  bind:confirm="onLogoutConfirm"
-  bind:cancel="onLogoutCancel"
-/>
 
 <!-- 头像上传弹窗 -->
 <avatar-upload-dialog

@@ -30,7 +30,7 @@
       },
       {
         "pagePath": "pages/community/community",
-        "text": "社区",
+        "text": "时刻",
         "iconPath": "images/community.png",
         "selectedIconPath": "images/community-active.png"
       },

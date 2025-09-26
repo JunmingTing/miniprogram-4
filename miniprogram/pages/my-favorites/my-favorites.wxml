@@ -1,63 +1,40 @@
 <!--我的收藏页面-->
 <view class="my-favorites-container">
-  <!-- 分类标签 -->
-  <t-tabs value="{{activeTab}}" bind:change="onTabChange">
-    <t-tab-panel value="news" label="资讯">
-      <!-- 收藏的资讯列表 -->
-      <view class="favorites-list">
-        <view class="favorite-item" wx:for="{{favoriteNews}}" wx:key="id" bind:tap="onNewsTap" data-news="{{item}}">
-          <view class="item-content">
-            <t-image 
-              src="{{item.image}}" 
-              class="item-image"
-              mode="aspectFill"
-              width="160rpx"
-              height="120rpx"
-            />
-            <view class="item-info">
-              <text class="item-title">{{item.title}}</text>
-              <text class="item-time">{{item.time}}</text>
-            </view>
-          </view>
-          <view class="item-actions">
-            <view class="action-item" bind:tap="onLikeTap" data-id="{{item.id}}" catchtap="true">
-              <t-icon name="{{item.isLiked ? 'heart-filled' : 'heart'}}" size="32rpx" color="{{item.isLiked ? '#ff4d4f' : '#999'}}" />
-              <text class="action-text">{{item.likeCount}}</text>
-            </view>
-            <view class="action-item" bind:tap="onCommentTap" data-id="{{item.id}}" catchtap="true">
-              <t-icon name="chat" size="32rpx" color="#999" />
-              <text class="action-text">{{item.commentCount}}</text>
-            </view>
-            <view class="action-item" bind:tap="onFavoriteTap" data-id="{{item.id}}" catchtap="true">
-              <t-icon name="{{item.isFavorited ? 'bookmark-filled' : 'bookmark'}}" size="32rpx" color="{{item.isFavorited ? '#ff4d4f' : '#999'}}" />
-              <text class="action-text">{{item.favoriteCount}}</text>
-            </view>
-            <view class="action-item" bind:tap="onShareTap" data-id="{{item.id}}" catchtap="true">
-              <t-icon name="share" size="32rpx" color="#999" />
-            </view>
-          </view>
+  <!-- 收藏的资讯列表 -->
+  <view class="favorites-list">
+    <view class="favorite-item" wx:for="{{favoriteNews}}" wx:key="id" bind:tap="onNewsTap" data-news="{{item}}">
+      <view class="item-content">
+        <t-image 
+          src="{{item.image}}" 
+          class="item-image"
+          mode="aspectFill"
+          width="160rpx"
+          height="120rpx"
+        />
+        <view class="item-info">
+          <text class="item-title">{{item.title}}</text>
+          <text class="item-time">{{item.time}}</text>
         </view>
       </view>
-    </t-tab-panel>
-    
-    <t-tab-panel value="posts" label="帖子">
-      <!-- 收藏的帖子列表 -->
-      <view class="favorites-grid" wx:if="{{favoritePosts.length > 0}}">
-        <view class="post-item" wx:for="{{favoritePosts}}" wx:key="id" bind:tap="onPostTap" data-post="{{item}}">
-          <t-image 
-            src="{{item.coverImage}}" 
-            class="post-image"
-            mode="aspectFill"
-            width="100%"
-            height="200rpx"
-          />
-          <view class="post-info">
-            <text class="image-count">{{item.imageCount}}张</text>
-          </view>
+      <view class="item-actions">
+        <view class="action-item" bind:tap="onLikeTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="{{item.isLiked ? 'heart-filled' : 'heart'}}" size="32rpx" color="{{item.isLiked ? '#ff4d4f' : '#999'}}" />
+          <text class="action-text">{{item.likeCount}}</text>
+        </view>
+        <view class="action-item" bind:tap="onCommentTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="chat" size="32rpx" color="#999" />
+          <text class="action-text">{{item.commentCount}}</text>
+        </view>
+        <view class="action-item" bind:tap="onFavoriteTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="{{item.isFavorited ? 'bookmark-filled' : 'bookmark'}}" size="32rpx" color="{{item.isFavorited ? '#ff4d4f' : '#999'}}" />
+          <text class="action-text">{{item.favoriteCount}}</text>
+        </view>
+        <view class="action-item" bind:tap="onShareTap" data-id="{{item.id}}" catchtap="true">
+          <t-icon name="share" size="32rpx" color="#999" />
         </view>
       </view>
-    </t-tab-panel>
-  </t-tabs>
+    </view>
+  </view>
 
   <!-- 加载状态 -->
   <view class="loading-container" wx:if="{{loading}}">
@@ -66,8 +43,8 @@
   </view>
 
   <!-- 空状态 -->
-  <t-empty wx:if="{{!loading && ((activeTab === 'news' && favoriteNews.length === 0) || (activeTab === 'posts' && favoritePosts.length === 0))}}" 
+  <t-empty wx:if="{{!loading && favoriteNews.length === 0}}" 
     icon="bookmark" 
-    description="暂无收藏内容" 
+    description="暂无收藏的资讯" 
   />
 </view>

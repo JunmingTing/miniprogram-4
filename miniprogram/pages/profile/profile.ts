@@ -21,7 +21,6 @@ Page({
       openId: ''
     } as UserInfo,
     hasRejectedPosts: false,
-    showLogoutDialog: false,
     showAvatarDialog: false
   },
 
@@ -405,20 +404,6 @@ Page({
     });
   },
 
-  // 管理帖子
-  onMyPostsTap() {
-    if (!this.data.isLoggedIn) {
-      wx.showToast({
-        title: '请先登录',
-        icon: 'none'
-      });
-      return;
-    }
-
-    wx.navigateTo({
-      url: '/pages/my-posts/my-posts'
-    });
-  },
 
   // 我的收藏
   onMyFavoritesTap() {
@@ -443,68 +428,6 @@ Page({
     });
   },
 
-  // 跳转到上传测试页面
-  onTestUploadTap() {
-    wx.navigateTo({
-      url: '/pages/test-upload/test-upload'
-    });
-  },
-
-  // 测试云函数
-  onTestCloudFunction() {
-    wx.showLoading({
-      title: '测试中...'
-    });
-    
-    // 先测试基础云函数
-    wx.cloud.callFunction({
-      name: 'test',
-      success: (res: any) => {
-        console.log('基础云函数测试结果:', res);
-        
-        // 再测试云存储权限
-        wx.cloud.callFunction({
-          name: 'checkStorage',
-          data: { action: 'checkPermission' },
-          success: (storageRes: any) => {
-            console.log('云存储权限测试结果:', storageRes);
-            wx.hideLoading();
-            
-            const testResult = res.result || {};
-            const storageResult = storageRes.result || {};
-            
-            wx.showModal({
-              title: '云开发环境测试',
-              content: `基础云函数: ${testResult.success ? '正常' : '异常'}\n云存储权限: ${storageResult.success ? '正常' : '异常'}\n\n基础消息: ${testResult.message || '无'}\n存储消息: ${storageResult.message || '无'}`,
-              showCancel: false,
-              confirmText: '知道了'
-            });
-          },
-          fail: (storageErr) => {
-            console.error('云存储权限测试失败:', storageErr);
-            wx.hideLoading();
-            const testResult = res.result || {};
-            wx.showModal({
-              title: '云开发环境测试',
-              content: `基础云函数: ${testResult.success ? '正常' : '异常'}\n云存储权限: 测试失败\n\n基础消息: ${testResult.message || '无'}\n存储错误: ${storageErr.errMsg || '未知错误'}`,
-              showCancel: false,
-              confirmText: '知道了'
-            });
-          }
-        });
-      },
-      fail: (err) => {
-        console.error('基础云函数测试失败:', err);
-        wx.hideLoading();
-        wx.showModal({
-          title: '云函数测试失败',
-          content: `错误: ${err.errMsg || '未知错误'}`,
-          showCancel: false,
-          confirmText: '知道了'
-        });
-      }
-    });
-  },
 
   // 关于我们
   onAboutTap() {
@@ -518,12 +441,25 @@ Page({
 
   // 退出登录
   onLogoutTap() {
-    this.setData({ showLogoutDialog: true });
+    wx.showModal({
+      title: '确认退出',
+      content: '您确定要退出登录吗？',
+      confirmText: '确认',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          // 用户点击了确认按钮，执行退出登录操作
+          this.performLogout();
+        } else if (res.cancel) {
+          // 用户点击了取消按钮，不执行任何操作
+          console.log('用户取消退出登录');
+        }
+      }
+    });
   },
 
-  onLogoutConfirm() {
-    this.setData({ showLogoutDialog: false });
-    
+  // 执行退出登录操作
+  performLogout() {
     // 清除本地存储的用户信息
     wx.removeStorageSync('userInfo');
     
@@ -541,9 +477,5 @@ Page({
       title: '已退出登录',
       icon: 'success'
     });
-  },
-
-  onLogoutCancel() {
-    this.setData({ showLogoutDialog: false });
   }
 });

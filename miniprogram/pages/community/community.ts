@@ -17,12 +17,14 @@ interface Post {
   time: string;
   images: string[];
   currentImageIndex: number;
-  isLiked: boolean;
-  isFavorited: boolean;
-  likeCount: number;
-  commentCount: number;
-  favoriteCount: number;
   tags: PostTag[];
+}
+
+interface UserInfo {
+  nickName: string;
+  avatar: string;
+  openId: string;
+  _id?: string;
 }
 
 Page({
@@ -34,23 +36,30 @@ Page({
     showTagDialog: false,
     tagText: '',
     currentPostId: '',
-    showReportDialog: false,
-    selectedReportReason: '',
-    reportOptions: [
-      { label: '内容不当', value: 'inappropriate' },
-      { label: '虚假信息', value: 'false_info' },
-      { label: '垃圾信息', value: 'spam' },
-      { label: '其他', value: 'other' }
-    ]
+    userInfo: {
+      nickName: '',
+      avatar: '',
+      openId: ''
+    } as UserInfo
   },
 
   onLoad() {
+    this.getUserInfo();
     this.loadPosts();
   },
 
   onShow() {
     // 页面显示时刷新数据
+    this.getUserInfo();
     this.refreshData();
+  },
+
+  // 获取用户信息
+  getUserInfo() {
+    const userInfo = wx.getStorageSync('userInfo');
+    if (userInfo) {
+      this.setData({ userInfo });
+    }
   },
 
   onReachBottom() {
@@ -69,14 +78,18 @@ Page({
   loadPosts() {
     this.setData({ loading: true });
 
-    // 模拟数据
+    // 获取用户信息作为作者信息
+    const userInfo = this.data.userInfo;
+    const authorInfo = {
+      name: userInfo.nickName || '我的精彩时刻',
+      avatar: userInfo.avatar || 'https://via.placeholder.com/80x80/4F46E5/FFFFFF?text=我'
+    };
+
+    // 模拟数据 - 所有帖子都使用用户本人的信息
     const mockPosts: Post[] = [
       {
         id: '1',
-        author: {
-          name: '游戏达人',
-          avatar: 'https://via.placeholder.com/80x80/10B981/FFFFFF?text=用户'
-        },
+        author: authorInfo,
         time: '2024-01-15 16:30',
         images: [
           'https://via.placeholder.com/750x400/4F46E5/FFFFFF?text=游戏截图1',
@@ -84,11 +97,6 @@ Page({
           'https://via.placeholder.com/750x400/F59E0B/FFFFFF?text=游戏截图3'
         ],
         currentImageIndex: 0,
-        isLiked: false,
-        isFavorited: false,
-        likeCount: 128,
-        commentCount: 23,
-        favoriteCount: 45,
         tags: [
           { id: '1', text: '原神', likeCount: 12, isLiked: false },
           { id: '2', text: '角色', likeCount: 8, isLiked: false },
@@ -97,21 +105,13 @@ Page({
       },
       {
         id: '2',
-        author: {
-          name: '电竞选手',
-          avatar: 'https://via.placeholder.com/80x80/F59E0B/FFFFFF?text=玩家'
-        },
+        author: authorInfo,
         time: '2024-01-15 15:45',
         images: [
           'https://via.placeholder.com/750x400/EF4444/FFFFFF?text=电竞截图1',
           'https://via.placeholder.com/750x400/8B5CF6/FFFFFF?text=电竞截图2'
         ],
         currentImageIndex: 0,
-        isLiked: false,
-        isFavorited: false,
-        likeCount: 256,
-        commentCount: 67,
-        favoriteCount: 89,
         tags: [
           { id: '4', text: 'LOL', likeCount: 15, isLiked: false },
           { id: '5', text: '电竞', likeCount: 9, isLiked: false }
@@ -119,10 +119,7 @@ Page({
       },
       {
         id: '3',
-        author: {
-          name: '游戏爱好者',
-          avatar: 'https://via.placeholder.com/80x80/8B5CF6/FFFFFF?text=粉丝'
-        },
+        author: authorInfo,
         time: '2024-01-15 14:20',
         images: [
           'https://via.placeholder.com/750x400/8B5CF6/FFFFFF?text=游戏截图1',
@@ -131,11 +128,6 @@ Page({
           'https://via.placeholder.com/750x400/84CC16/FFFFFF?text=游戏截图4'
         ],
         currentImageIndex: 0,
-        isLiked: false,
-        isFavorited: false,
-        likeCount: 89,
-        commentCount: 12,
-        favoriteCount: 34,
         tags: [
           { id: '6', text: '手游', likeCount: 6, isLiked: false },
           { id: '7', text: '攻略', likeCount: 3, isLiked: false }
@@ -168,25 +160,24 @@ Page({
 
     this.setData({ loading: true });
 
-    // 模拟加载更多数据
+    // 获取用户信息作为作者信息
+    const userInfo = this.data.userInfo;
+    const authorInfo = {
+      name: userInfo.nickName || '我的精彩时刻',
+      avatar: userInfo.avatar || 'https://via.placeholder.com/80x80/4F46E5/FFFFFF?text=我'
+    };
+
+    // 模拟加载更多数据 - 所有帖子都使用用户本人的信息
     setTimeout(() => {
       const morePosts: Post[] = [
         {
           id: `${this.data.page + 1}_1`,
-          author: {
-            name: '新用户',
-            avatar: 'https://via.placeholder.com/80x80/FF6B6B/FFFFFF?text=新'
-          },
+          author: authorInfo,
           time: '2024-01-14 20:30',
           images: [
             'https://via.placeholder.com/750x400/FF6B6B/FFFFFF?text=新帖子'
           ],
           currentImageIndex: 0,
-          isLiked: false,
-          isFavorited: false,
-          likeCount: 45,
-          commentCount: 8,
-          favoriteCount: 12,
           tags: [
             { id: '8', text: '新手', likeCount: 2, isLiked: false }
           ]
@@ -232,82 +223,6 @@ Page({
     });
   },
 
-  // 点赞
-  onLikeTap(e: any) {
-    const id = e.currentTarget.dataset.id;
-    this.toggleLike(id);
-  },
-
-  // 评论
-  onCommentTap(e: any) {
-    const id = e.currentTarget.dataset.id;
-    wx.navigateTo({
-      url: `/pages/post-detail/post-detail?id=${id}&scrollToComment=true`
-    });
-  },
-
-  // 收藏
-  onFavoriteTap(e: any) {
-    const id = e.currentTarget.dataset.id;
-    this.toggleFavorite(id);
-  },
-
-  // 分享
-  onShareTap(e: any) {
-    const id = e.currentTarget.dataset.id;
-    wx.showActionSheet({
-      itemList: ['分享到微信', '分享到朋友圈', '复制链接'],
-      success: (res) => {
-        console.log('分享选项:', res.tapIndex);
-        wx.showToast({
-          title: '分享成功',
-          icon: 'success'
-        });
-      }
-    });
-  },
-
-  // 举报
-  onReportTap(e: any) {
-    const id = e.currentTarget.dataset.id;
-    this.setData({
-      showReportDialog: true,
-      currentPostId: id
-    });
-  },
-
-  onSelectReportReason(e: any) {
-    this.setData({ selectedReportReason: e.currentTarget.dataset.value });
-  },
-
-  onReportConfirm() {
-    if (!this.data.selectedReportReason) {
-      wx.showToast({
-        title: '请选择举报原因',
-        icon: 'none'
-      });
-      return;
-    }
-
-    wx.showToast({
-      title: '举报已提交',
-      icon: 'success'
-    });
-
-    this.setData({
-      showReportDialog: false,
-      selectedReportReason: '',
-      currentPostId: ''
-    });
-  },
-
-  onReportCancel() {
-    this.setData({
-      showReportDialog: false,
-      selectedReportReason: '',
-      currentPostId: ''
-    });
-  },
 
   // 添加标签
   onAddTagTap(e: any) {
@@ -385,49 +300,6 @@ Page({
     this.toggleTagLike(tag);
   },
 
-  // 切换点赞状态
-  toggleLike(id: string) {
-    const posts = this.data.posts.map(post => {
-      if (post.id === id) {
-        return {
-          ...post,
-          isLiked: !post.isLiked,
-          likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1
-        };
-      }
-      return post;
-    });
-
-    this.setData({ posts });
-
-    const post = posts.find(p => p.id === id);
-    wx.showToast({
-      title: post?.isLiked ? '已点赞' : '已取消点赞',
-      icon: 'none'
-    });
-  },
-
-  // 切换收藏状态
-  toggleFavorite(id: string) {
-    const posts = this.data.posts.map(post => {
-      if (post.id === id) {
-        return {
-          ...post,
-          isFavorited: !post.isFavorited,
-          favoriteCount: post.isFavorited ? post.favoriteCount - 1 : post.favoriteCount + 1
-        };
-      }
-      return post;
-    });
-
-    this.setData({ posts });
-
-    const post = posts.find(p => p.id === id);
-    wx.showToast({
-      title: post?.isFavorited ? '已收藏' : '已取消收藏',
-      icon: 'none'
-    });
-  },
 
   // 切换标签点赞状态
   toggleTagLike(tag: PostTag) {

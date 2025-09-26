@@ -1,4 +1,9 @@
 // 首页逻辑
+interface NewsTag {
+  text: string;
+  theme: string;
+}
+
 interface NewsItem {
   id: string;
   title: string;
@@ -8,8 +13,9 @@ interface NewsItem {
   isLiked: boolean;
   isFavorited: boolean;
   likeCount: number;
-  commentCount: number;
   favoriteCount: number;
+  shareCount: number;
+  tags: NewsTag[];
   isPinned?: boolean;
 }
 
@@ -59,8 +65,12 @@ Page({
         isLiked: false,
         isFavorited: false,
         likeCount: 1200,
-        commentCount: 89,
         favoriteCount: 456,
+        shareCount: 89,
+        tags: [
+          { text: '手游', theme: 'default' },
+          { text: '原神', theme: 'default' }
+        ],
         isPinned: true
       },
       {
@@ -72,8 +82,12 @@ Page({
         isLiked: false,
         isFavorited: false,
         likeCount: 856,
-        commentCount: 23,
-        favoriteCount: 123
+        favoriteCount: 123,
+        shareCount: 45,
+        tags: [
+          { text: '电竞', theme: 'default' },
+          { text: 'LOL', theme: 'default' }
+        ]
       },
       {
         id: '3',
@@ -84,8 +98,12 @@ Page({
         isLiked: false,
         isFavorited: false,
         likeCount: 2100,
-        commentCount: 156,
-        favoriteCount: 789
+        favoriteCount: 789,
+        shareCount: 156,
+        tags: [
+          { text: '手游', theme: 'default' },
+          { text: '王者荣耀', theme: 'default' }
+        ]
       },
       {
         id: '4',
@@ -96,8 +114,12 @@ Page({
         isLiked: false,
         isFavorited: false,
         likeCount: 3400,
-        commentCount: 67,
-        favoriteCount: 234
+        favoriteCount: 234,
+        shareCount: 67,
+        tags: [
+          { text: 'PS5', theme: 'default' },
+          { text: '单机', theme: 'default' }
+        ]
       }
     ];
 
@@ -144,8 +166,12 @@ Page({
           isLiked: false,
           isFavorited: false,
           likeCount: 567,
-          commentCount: 34,
-          favoriteCount: 123
+          favoriteCount: 123,
+          shareCount: 34,
+          tags: [
+            { text: 'PC', theme: 'default' },
+            { text: 'steam', theme: 'default' }
+          ]
         }
       ];
 
@@ -191,13 +217,6 @@ Page({
     this.toggleLike(id);
   },
 
-  // 评论
-  onCommentTap(e: any) {
-    const id = e.currentTarget.dataset.id;
-    wx.navigateTo({
-      url: `/pages/news-detail/news-detail?id=${id}&scrollToComment=true`
-    });
-  },
 
   // 收藏
   onFavoriteTap(e: any) {

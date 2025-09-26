@@ -27,7 +27,17 @@
         />
         <view class="news-info">
           <text class="news-title">{{item.title}}</text>
-          <text class="news-time">{{item.time}}</text>
+          <view class="news-tags" wx:if="{{item.tags.length > 0}}">
+            <t-tag 
+              wx:for="{{item.tags}}" 
+              wx:key="index" 
+              size="small" 
+              theme="{{item.theme}}"
+              class="news-tag"
+            >
+              {{item.text}}
+            </t-tag>
+          </view>
         </view>
       </view>
       <view class="news-actions">
@@ -35,18 +45,16 @@
           <t-icon name="{{item.isLiked ? 'heart-filled' : 'heart'}}" size="32rpx" color="{{item.isLiked ? '#ff4d4f' : '#999'}}" />
           <text class="action-text">{{item.likeCount}}</text>
         </view>
-        <view class="action-item" bind:tap="onCommentTap" data-id="{{item.id}}" catchtap="true">
-          <t-icon name="chat" size="32rpx" color="#999" />
-          <text class="action-text">{{item.commentCount}}</text>
-        </view>
         <view class="action-item" bind:tap="onFavoriteTap" data-id="{{item.id}}" catchtap="true">
           <t-icon name="{{item.isFavorited ? 'bookmark-filled' : 'bookmark'}}" size="32rpx" color="{{item.isFavorited ? '#ff4d4f' : '#999'}}" />
           <text class="action-text">{{item.favoriteCount}}</text>
         </view>
         <view class="action-item" bind:tap="onShareTap" data-id="{{item.id}}" catchtap="true">
           <t-icon name="share" size="32rpx" color="#999" />
+          <text class="action-text">{{item.shareCount}}</text>
         </view>
       </view>
+      <view class="news-time">{{item.time}}</view>
     </view>
   </view>
 
@@ -63,7 +71,17 @@
         />
         <view class="news-info">
           <text class="news-title">{{item.title}}</text>
-          <text class="news-time">{{item.time}}</text>
+          <view class="news-tags" wx:if="{{item.tags.length > 0}}">
+            <t-tag 
+              wx:for="{{item.tags}}" 
+              wx:key="index" 
+              size="small" 
+              theme="{{item.theme}}"
+              class="news-tag"
+            >
+              {{item.text}}
+            </t-tag>
+          </view>
         </view>
       </view>
       <view class="news-actions">
@@ -71,18 +89,16 @@
           <t-icon name="{{item.isLiked ? 'heart-filled' : 'heart'}}" size="32rpx" color="{{item.isLiked ? '#ff4d4f' : '#999'}}" />
           <text class="action-text">{{item.likeCount}}</text>
         </view>
-        <view class="action-item" bind:tap="onCommentTap" data-id="{{item.id}}" catchtap="true">
-          <t-icon name="chat" size="32rpx" color="#999" />
-          <text class="action-text">{{item.commentCount}}</text>
-        </view>
         <view class="action-item" bind:tap="onFavoriteTap" data-id="{{item.id}}" catchtap="true">
           <t-icon name="{{item.isFavorited ? 'bookmark-filled' : 'bookmark'}}" size="32rpx" color="{{item.isFavorited ? '#ff4d4f' : '#999'}}" />
           <text class="action-text">{{item.favoriteCount}}</text>
         </view>
         <view class="action-item" bind:tap="onShareTap" data-id="{{item.id}}" catchtap="true">
           <t-icon name="share" size="32rpx" color="#999" />
+          <text class="action-text">{{item.shareCount}}</text>
         </view>
       </view>
+      <view class="news-time">{{item.time}}</view>
     </view>
   </view>
 
