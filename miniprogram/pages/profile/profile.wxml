@@ -50,6 +50,69 @@
     </t-cell-group>
   </view>
 
+  <!-- 测试功能区域 -->
+  <view class="test-section">
+    <view class="section-title">
+      <t-icon name="experiment" size="32rpx" color="#4F46E5" />
+      <text class="title-text">图片上传测试</text>
+    </view>
+    
+    <view class="test-content">
+      <!-- 当前测试图片显示 -->
+      <view class="test-image-container" wx:if="{{testImage}}">
+        <view class="test-image-wrapper">
+          <t-image 
+            src="{{testImage}}" 
+            class="test-image"
+            mode="aspectFill"
+            width="300rpx"
+            height="300rpx"
+          />
+          <view class="image-info">
+            <text class="image-path">{{testImagePath}}</text>
+            <text class="upload-time">{{testImageTime}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 无图片时的占位 -->
+      <view class="test-placeholder" wx:else>
+        <t-icon name="image" size="80rpx" color="#ccc" />
+        <text class="placeholder-text">暂无测试图片</text>
+      </view>
+      
+      <!-- 操作按钮 -->
+      <view class="test-actions">
+        <t-button 
+          theme="primary" 
+          size="large" 
+          bind:tap="onTestUploadTap"
+          loading="{{uploadingTest}}"
+        >
+          {{testImage ? '重新上传' : '选择图片'}}
+        </t-button>
+        
+        <t-button 
+          theme="danger" 
+          variant="outline" 
+          size="large" 
+          bind:tap="onTestDeleteTap"
+          wx:if="{{testImage}}"
+          loading="{{deletingTest}}"
+        >
+          删除图片
+        </t-button>
+      </view>
+      
+      <!-- 功能说明 -->
+      <view class="test-description">
+        <text class="desc-text">• 图片将上传到云存储 /images 目录</text>
+        <text class="desc-text">• 每次上传会自动删除旧图片</text>
+        <text class="desc-text">• 支持实时预览和删除功能</text>
+      </view>
+    </view>
+  </view>
+
   <!-- 其他功能 -->
   <view class="other-section">
     <t-cell-group>

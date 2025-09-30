@@ -21,7 +21,13 @@ Page({
       openId: ''
     } as UserInfo,
     hasRejectedPosts: false,
-    showAvatarDialog: false
+    showAvatarDialog: false,
+    // 测试图片上传相关
+    testImage: '', // 当前测试图片的临时URL
+    testImagePath: '', // 云存储路径
+    testImageTime: '', // 上传时间
+    uploadingTest: false, // 上传中状态
+    deletingTest: false // 删除中状态
   },
 
   onLoad() {
@@ -29,6 +35,7 @@ Page({
     this.initCloud();
     this.checkLoginStatus();
     this.checkRejectedPosts();
+    this.loadTestImage();
   },
 
   // 初始化云开发
@@ -47,6 +54,7 @@ Page({
     // 页面显示时检查登录状态和帖子状态
     this.checkLoginStatus();
     this.checkRejectedPosts();
+    this.loadTestImage();
     
     // 调试：显示当前用户信息
     console.log('Profile页面显示，当前用户信息:', this.data.userInfo);
@@ -476,6 +484,261 @@ Page({
     wx.showToast({
       title: '已退出登录',
       icon: 'success'
+    });
+  },
+
+  // ========== 测试图片上传功能 ==========
+
+  // 加载测试图片
+  loadTestImage() {
+    console.log('=== 加载测试图片 ===');
+    const testImageInfo = wx.getStorageSync('testImageInfo');
+    if (testImageInfo) {
+      console.log('从本地存储加载测试图片信息:', testImageInfo);
+      
+      // 获取临时URL
+      this.getTestImageTempUrl(testImageInfo.fileID, testImageInfo.path, testImageInfo.time);
+    } else {
+      console.log('本地存储中没有测试图片信息');
+      this.setData({
+        testImage: '',
+        testImagePath: '',
+        testImageTime: ''
+      });
+    }
+  },
+
+  // 获取测试图片的临时URL
+  async getTestImageTempUrl(fileID: string, path: string, time: string) {
+    try {
+      console.log('获取测试图片临时URL，fileID:', fileID);
+      const result = await wx.cloud.getTempFileURL({
+        fileList: [fileID]
+      });
+
+      if (result.fileList && result.fileList.length > 0) {
+        const file = result.fileList[0];
+        if (file.status === 0) {
+          console.log('获取测试图片临时URL成功:', file.tempFileURL);
+          this.setData({
+            testImage: file.tempFileURL,
+            testImagePath: path,
+            testImageTime: time
+          });
+        } else {
+          console.error('获取测试图片临时URL失败，状态码:', file.status);
+          // 清除无效的本地存储
+          wx.removeStorageSync('testImageInfo');
+          this.setData({
+            testImage: '',
+            testImagePath: '',
+            testImageTime: ''
+          });
+        }
+      }
+    } catch (err) {
+      console.error('获取测试图片临时URL异常:', err);
+      // 清除无效的本地存储
+      wx.removeStorageSync('testImageInfo');
+      this.setData({
+        testImage: '',
+        testImagePath: '',
+        testImageTime: ''
+      });
+    }
+  },
+
+  // 测试上传图片
+  onTestUploadTap() {
+    console.log('=== 点击测试上传图片 ===');
+    
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        console.log('选择图片成功:', res);
+        if (res.tempFiles && res.tempFiles.length > 0) {
+          const tempFile = res.tempFiles[0];
+          this.uploadTestImage(tempFile.tempFilePath);
+        }
+      },
+      fail: (err) => {
+        console.error('选择图片失败:', err);
+        wx.showToast({
+          title: '选择图片失败',
+          icon: 'error'
+        });
+      }
+    });
+  },
+
+  // 上传测试图片
+  async uploadTestImage(tempFilePath: string) {
+    console.log('=== 开始上传测试图片 ===');
+    console.log('临时文件路径:', tempFilePath);
+
+    this.setData({ uploadingTest: true });
+
+    try {
+      // 如果有旧图片，先删除
+      if (this.data.testImagePath) {
+        console.log('删除旧的测试图片:', this.data.testImagePath);
+        await this.deleteTestImageFromCloud(this.data.testImagePath);
+      }
+
+      // 生成新的文件名
+      const timestamp = new Date().getTime();
+      const randomStr = Math.random().toString(36).substring(2, 8);
+      const fileName = `test_${timestamp}_${randomStr}.jpg`;
+      const cloudPath = `images/${fileName}`;
+
+      console.log('上传到云存储，路径:', cloudPath);
+
+      // 上传到云存储
+      const uploadResult = await wx.cloud.uploadFile({
+        cloudPath: cloudPath,
+        filePath: tempFilePath
+      });
+
+      console.log('上传成功:', uploadResult);
+
+      // 获取临时URL用于显示
+      const tempUrlResult = await wx.cloud.getTempFileURL({
+        fileList: [uploadResult.fileID]
+      });
+
+      if (tempUrlResult.fileList && tempUrlResult.fileList.length > 0) {
+        const tempFileURL = tempUrlResult.fileList[0].tempFileURL;
+        const uploadTime = new Date().toLocaleString();
+
+        console.log('获取临时URL成功:', tempFileURL);
+
+        // 保存到本地存储
+        const testImageInfo = {
+          fileID: uploadResult.fileID,
+          path: cloudPath,
+          time: uploadTime
+        };
+        wx.setStorageSync('testImageInfo', testImageInfo);
+
+        // 更新界面
+        this.setData({
+          testImage: tempFileURL,
+          testImagePath: cloudPath,
+          testImageTime: uploadTime,
+          uploadingTest: false
+        });
+
+        wx.showToast({
+          title: '上传成功',
+          icon: 'success'
+        });
+
+        console.log('测试图片上传完成');
+      }
+    } catch (err) {
+      console.error('上传测试图片失败:', err);
+      this.setData({ uploadingTest: false });
+      
+      wx.showToast({
+        title: '上传失败',
+        icon: 'error'
+      });
+    }
+  },
+
+  // 删除测试图片
+  onTestDeleteTap() {
+    console.log('=== 点击删除测试图片 ===');
+    
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要删除当前测试图片吗？',
+      confirmText: '删除',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          this.deleteTestImage();
+        }
+      }
+    });
+  },
+
+  // 执行删除测试图片
+  async deleteTestImage() {
+    console.log('=== 开始删除测试图片 ===');
+    
+    if (!this.data.testImagePath) {
+      console.log('没有测试图片可删除');
+      return;
+    }
+
+    this.setData({ deletingTest: true });
+
+    try {
+      // 从云存储删除文件
+      await this.deleteTestImageFromCloud(this.data.testImagePath);
+
+      // 清除本地存储
+      wx.removeStorageSync('testImageInfo');
+
+      // 更新界面
+      this.setData({
+        testImage: '',
+        testImagePath: '',
+        testImageTime: '',
+        deletingTest: false
+      });
+
+      wx.showToast({
+        title: '删除成功',
+        icon: 'success'
+      });
+
+      console.log('测试图片删除完成');
+    } catch (err) {
+      console.error('删除测试图片失败:', err);
+      this.setData({ deletingTest: false });
+      
+      wx.showToast({
+        title: '删除失败',
+        icon: 'error'
+      });
+    }
+  },
+
+  // 从云存储删除测试图片
+  async deleteTestImageFromCloud(cloudPath: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      console.log('从云存储删除文件:', cloudPath);
+      
+      // 构建完整的fileID
+      const fileID = `cloud://cloud1-4ghl6bw58e8ba561.636c-cloud1-4ghl6bw58e8ba561-1330048256/${cloudPath}`;
+      console.log('完整fileID:', fileID);
+
+      wx.cloud.deleteFile({
+        fileList: [fileID],
+        success: (res) => {
+          console.log('云存储删除文件成功:', res);
+          if (res.fileList && res.fileList.length > 0) {
+            const deleteResult = res.fileList[0];
+            if (deleteResult.status === 0) {
+              console.log('文件删除成功');
+              resolve();
+            } else {
+              console.error('文件删除失败，状态码:', deleteResult.status);
+              reject(new Error(`删除失败，状态码: ${deleteResult.status}`));
+            }
+          } else {
+            resolve(); // 没有返回结果也视为成功
+          }
+        },
+        fail: (err) => {
+          console.error('云存储删除文件失败:', err);
+          reject(err);
+        }
+      });
     });
   }
 });

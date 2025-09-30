@@ -1,5 +1,17 @@
 <!--精彩时刻页面 - 个人图片展示-->
 <view class="community-container">
+  <!-- 顶部工具栏 -->
+  <view class="toolbar">
+    <view class="toolbar-left">
+      <text class="page-title">精彩时刻</text>
+    </view>
+    <view class="toolbar-right">
+      <view class="refresh-btn" bind:tap="refreshAllImages">
+        <t-icon name="refresh" size="32rpx" color="#666" />
+      </view>
+    </view>
+  </view>
+
   <!-- 固定发布按钮 -->
   <view class="fixed-publish-btn" bind:tap="onPublishTap">
     <t-icon name="add" size="40rpx" color="#fff" />
@@ -9,40 +21,40 @@
   <view class="posts-list">
     <view class="post-item" wx:for="{{posts}}" wx:key="id" bind:tap="onPostTap" data-post="{{item}}">
 
-      <!-- 图片轮播 -->
-      <view class="post-images" wx:if="{{item.images.length > 0}}">
-        <t-swiper 
-          current="{{item.currentImageIndex}}"
-          bind:change="onImageChange"
+      <!-- 图片轮播 - 全屏显示 -->
+      <view class="post-images-container" wx:if="{{item.images.length > 0}}">
+        <swiper 
+          class="post-swiper-fullscreen"
+          current="{{item.currentImageIndex || 0}}"
+          bindchange="onImageChange"
           data-post-id="{{item.id}}"
-          class="post-swiper"
+          indicator-dots="{{false}}"
+          circular="{{item.images.length > 1}}"
           autoplay="{{false}}"
-          interval="0"
+          interval="5000"
           duration="300"
         >
-          <t-swiper-item wx:for="{{item.images}}" wx:key="index" wx:for-item="image">
-            <view class="image-container">
-              <t-image 
-                src="{{image}}" 
-                class="post-image"
-                mode="aspectFill"
-                width="100%"
-                height="400rpx"
-              />
-            </view>
-          </t-swiper-item>
-        </t-swiper>
+          <swiper-item wx:for="{{item.images}}" wx:key="index" wx:for-item="image">
+            <image 
+              src="{{image}}" 
+              class="post-image-fullscreen"
+              mode="widthFix"
+              bind:load="onImageLoad"
+              bind:error="onImageError"
+              data-post-id="{{item.id}}"
+              data-image-index="{{index}}"
+              lazy-load="{{false}}"
+            />
+          </swiper-item>
+        </swiper>
         
-        <!-- 图片指示器 -->
-        <view class="image-indicator" wx:if="{{item.images.length > 1}}">
-          <text class="indicator-text">{{item.currentImageIndex + 1}}/{{item.images.length}}</text>
-        </view>
-        
-        <!-- 滑动提示 -->
-        <view class="swipe-hint" wx:if="{{item.images.length > 1}}">
-          <t-icon name="chevron-left" size="24rpx" color="rgba(255,255,255,0.7)" />
-          <text class="hint-text">左右滑动</text>
-          <t-icon name="chevron-right" size="24rpx" color="rgba(255,255,255,0.7)" />
+        <!-- 简洁的图片指示器 -->
+        <view class="image-dots" wx:if="{{item.images.length > 1}}">
+          <view 
+            class="dot {{index === (item.currentImageIndex || 0) ? 'active' : ''}}" 
+            wx:for="{{item.images}}" 
+            wx:key="index"
+          ></view>
         </view>
       </view>
 
@@ -67,16 +79,43 @@
   </view>
 
   <!-- 加载更多 -->
-  <view class="load-more" wx:if="{{loading}}">
+  <view class="load-more" wx:if="{{loading && posts.length > 0}}">
     <t-loading size="40rpx" />
-    <text class="load-text">加载中...</text>
+    <text class="load-text">加载更多...</text>
+  </view>
+
+  <!-- 初次加载状态 -->
+  <view class="initial-loading" wx:if="{{loading && posts.length === 0}}">
+    <t-loading size="60rpx" />
+    <text class="loading-text">正在加载精彩时刻...</text>
   </view>
 
   <!-- 空状态 -->
-  <t-empty wx:if="{{!loading && posts.length === 0}}" 
-    icon="image" 
-    description="暂无帖子内容" 
-  />
+  <view class="empty-state" wx:if="{{!loading && posts.length === 0}}">
+    <t-empty 
+      icon="image" 
+      description="{{userInfo.openId ? '还没有发布过精彩时刻' : '登录后查看精彩时刻'}}" 
+    >
+      <view class="empty-actions">
+        <t-button wx:if="{{userInfo.openId}}" 
+          theme="primary" 
+          size="medium" 
+          bind:tap="onPublishTap"
+          class="empty-publish-btn"
+        >
+          发布第一个时刻
+        </t-button>
+        <t-button wx:else
+          theme="primary" 
+          size="medium" 
+          bind:tap="onLoginTap"
+          class="empty-login-btn"
+        >
+          立即登录
+        </t-button>
+      </view>
+    </t-empty>
+  </view>
 </view>
 
 

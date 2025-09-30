@@ -5,6 +5,51 @@
   padding-bottom: 20rpx;
 }
 
+/* 顶部工具栏 */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 30rpx;
+  background-color: #fff;
+  border-bottom: 1rpx solid #f0f0f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.toolbar-left {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background-color: #f8f9fa;
+  transition: all 0.2s;
+}
+
+.refresh-btn:active {
+  background-color: #e9ecef;
+  transform: scale(0.95);
+}
+
 /* 固定发布按钮 */
 .fixed-publish-btn {
   position: fixed;
@@ -28,93 +73,57 @@
 
 /* 帖子列表 */
 .posts-list {
-  padding: 20rpx;
+  padding: 0;
 }
 
 .post-item {
   background-color: #fff;
-  border-radius: 16rpx;
   margin-bottom: 20rpx;
   overflow: hidden;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
 }
 
 
-/* 帖子图片 */
-.post-images {
+/* 帖子图片 - 全屏显示，高度自适应 */
+.post-images-container {
   position: relative;
-  padding: 20rpx;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  background-color: #000;
 }
 
-.post-swiper {
+.post-swiper-fullscreen {
   width: 100%;
-  border-radius: 16rpx;
-  overflow: hidden;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
 }
 
-.image-container {
+.post-image-fullscreen {
   width: 100%;
-  height: 400rpx;
-  border-radius: 16rpx;
-  overflow: hidden;
-  background-color: #f0f0f0;
+  height: auto;
+  display: block;
+  background-color: #000;
 }
 
-.post-image {
-  width: 100%;
-  height: 400rpx;
-  border-radius: 16rpx;
-  transition: transform 0.3s ease;
-  background-color: #f0f0f0;
-}
-
-.post-image:active {
-  transform: scale(0.98);
-}
-
-.image-indicator {
+/* 图片指示器 - 简洁点状 */
+.image-dots {
   position: absolute;
-  bottom: 40rpx;
-  right: 40rpx;
-  background-color: rgba(0, 0, 0, 0.6);
-  color: #fff;
-  padding: 8rpx 16rpx;
-  border-radius: 20rpx;
-  backdrop-filter: blur(10rpx);
-}
-
-.indicator-text {
-  font-size: 20rpx;
-}
-
-/* 滑动提示 */
-.swipe-hint {
-  position: absolute;
-  top: 20rpx;
+  bottom: 20rpx;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  align-items: center;
-  gap: 8rpx;
-  background-color: rgba(0, 0, 0, 0.4);
-  color: #fff;
-  padding: 8rpx 16rpx;
-  border-radius: 20rpx;
-  backdrop-filter: blur(10rpx);
-  animation: fadeInOut 3s ease-in-out;
+  gap: 12rpx;
+  z-index: 10;
 }
 
-.hint-text {
-  font-size: 18rpx;
-  color: rgba(255, 255, 255, 0.9);
+.dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
 }
 
-@keyframes fadeInOut {
-  0% { opacity: 0; }
-  20% { opacity: 1; }
-  80% { opacity: 1; }
-  100% { opacity: 0; }
+.dot.active {
+  background-color: rgba(255, 255, 255, 0.9);
+  transform: scale(1.2);
 }
 
 /* 操作按钮 */
@@ -147,12 +156,14 @@
 
 /* 标签区域 */
 .post-tags {
-  padding: 0 30rpx 30rpx;
+  padding: 40rpx 30rpx 30rpx;
+  margin-top: 20rpx;
   display: flex;
   flex-wrap: wrap;
   gap: 16rpx;
   align-items: center;
   position: relative;
+  background-color: #fff;
 }
 
 .tag-item {
@@ -161,36 +172,47 @@
 
 .post-tag {
   transition: all 0.2s;
+  background-color: #fff8f0 !important;
+  color: #e6850e !important;
+  border: 1rpx solid #ff9500 !important;
+  font-size: 26rpx !important;
+  font-weight: 500 !important;
+  border-radius: 4rpx !important;
+  padding: 8rpx 16rpx !important;
 }
 
 .post-tag:active {
   transform: scale(0.95);
+  background-color: #ffe8cc !important;
 }
 
 /* 添加标签按钮 */
 .add-tag-btn {
   position: absolute;
-  bottom: 10rpx;
+  bottom: 30rpx;
   right: 30rpx;
   display: flex;
   align-items: center;
-  gap: 6rpx;
-  padding: 8rpx 16rpx;
-  border: 1rpx dashed #ccc;
-  border-radius: 16rpx;
-  background-color: #fafafa;
-  transition: all 0.2s;
+  gap: 8rpx;
+  padding: 12rpx 20rpx;
+  border: 2rpx dashed #0052D9;
+  border-radius: 20rpx;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e6f0ff 100%);
+  box-shadow: 0 2rpx 8rpx rgba(0, 82, 217, 0.1);
+  transition: all 0.3s ease;
   z-index: 10;
 }
 
 .add-tag-btn:active {
-  background-color: #f0f0f0;
+  background: linear-gradient(135deg, #d4e7ff 0%, #b8daff 100%);
   transform: scale(0.95);
+  box-shadow: 0 1rpx 4rpx rgba(0, 82, 217, 0.2);
 }
 
 .add-tag-text {
-  font-size: 18rpx;
-  color: #999;
+  font-size: 26rpx;
+  color: #0052D9;
+  font-weight: 500;
 }
 
 /* 加载更多 */
@@ -205,6 +227,39 @@
 .load-text {
   font-size: 24rpx;
   margin-top: 20rpx;
+}
+
+/* 初次加载状态 */
+.initial-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 150rpx 40rpx;
+  color: #666;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  margin-top: 30rpx;
+  color: #666;
+}
+
+/* 空状态样式 */
+.empty-state {
+  padding: 100rpx 40rpx;
+  text-align: center;
+}
+
+.empty-actions {
+  margin-top: 40rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.empty-publish-btn,
+.empty-login-btn {
+  min-width: 240rpx;
 }
 
 

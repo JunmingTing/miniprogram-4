@@ -11,96 +11,117 @@ interface MyPost {
 Page({
   data: {
     posts: [] as MyPost[],
-    loading: true
+    loading: true,
+    userInfo: null,
   },
 
   onLoad() {
-    this.loadMyPosts();
+    const userInfo = wx.getStorageSync('userInfo');
+    if (userInfo) {
+      this.setData({ userInfo });
+      this.loadMyPosts();
+    } else {
+      // Handle case where user info is not available
+      this.setData({ loading: false });
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none',
+      });
+    }
   },
 
   onShow() {
     // 页面显示时刷新数据
-    this.loadMyPosts();
+    if (this.data.userInfo) {
+      this.loadMyPosts();
+    }
   },
 
   // 加载我的帖子
-  loadMyPosts() {
+  async loadMyPosts() {
+    if (!this.data.userInfo || !this.data.userInfo.openId) {
+      console.error('无法加载帖子，未找到用户信息或 openId');
+      this.setData({ loading: false });
+      return;
+    }
+
     this.setData({ loading: true });
 
-    // 模拟数据
-    const mockPosts: MyPost[] = [
-      {
-        id: '1',
-        coverImage: 'https://via.placeholder.com/200x200/4F46E5/FFFFFF?text=帖子1',
-        imageCount: 3,
-        isRejected: false,
-        publishTime: '2024-01-15 16:30'
-      },
-      {
-        id: '2',
-        coverImage: 'https://via.placeholder.com/200x200/EF4444/FFFFFF?text=帖子2',
-        imageCount: 2,
-        isRejected: true,
-        rejectReason: '图片内容不符合社区规范',
-        publishTime: '2024-01-15 15:45'
-      },
-      {
-        id: '3',
-        coverImage: 'https://via.placeholder.com/200x200/10B981/FFFFFF?text=帖子3',
-        imageCount: 1,
-        isRejected: false,
-        publishTime: '2024-01-15 14:20'
-      },
-      {
-        id: '4',
-        coverImage: 'https://via.placeholder.com/200x200/F59E0B/FFFFFF?text=帖子4',
-        imageCount: 4,
-        isRejected: false,
-        publishTime: '2024-01-15 13:10'
-      },
-      {
-        id: '5',
-        coverImage: 'https://via.placeholder.com/200x200/8B5CF6/FFFFFF?text=帖子5',
-        imageCount: 2,
-        isRejected: true,
-        rejectReason: '标签内容不当',
-        publishTime: '2024-01-15 12:30'
-      },
-      {
-        id: '6',
-        coverImage: 'https://via.placeholder.com/200x200/EC4899/FFFFFF?text=帖子6',
-        imageCount: 1,
-        isRejected: false,
-        publishTime: '2024-01-15 11:45'
-      },
-      {
-        id: '7',
-        coverImage: 'https://via.placeholder.com/200x200/06B6D4/FFFFFF?text=帖子7',
-        imageCount: 3,
-        isRejected: false,
-        publishTime: '2024-01-15 10:20'
-      },
-      {
-        id: '8',
-        coverImage: 'https://via.placeholder.com/200x200/84CC16/FFFFFF?text=帖子8',
-        imageCount: 2,
-        isRejected: false,
-        publishTime: '2024-01-15 09:15'
-      },
-      {
-        id: '9',
-        coverImage: 'https://via.placeholder.com/200x200/F97316/FFFFFF?text=帖子9',
-        imageCount: 1,
-        isRejected: true,
-        rejectReason: '重复发布相似内容',
-        publishTime: '2024-01-15 08:30'
-      }
-    ];
+    try {
+      const db = wx.cloud.database();
+      const res = await db.collection('posts')
+        .where({
+          _openid: this.data.userInfo.openId
+        })
+        .orderBy('createTime', 'desc')
+        .get();
 
-    this.setData({
-      posts: mockPosts,
-      loading: false
-    });
+      const myPosts = await Promise.all(res.data.map(async (post: any) => {
+        const coverImage = post.images && post.images.length > 0 ? post.images[0] : '';
+        const tempImageUrls = await this.getTempImageUrls([coverImage]);
+
+        return {
+          id: post._id,
+          coverImage: tempImageUrls[0] || '',
+          imageCount: post.images ? post.images.length : 0,
+          isRejected: post.isRejected || false,
+          rejectReason: post.rejectReason,
+          publishTime: this.formatTime(post.createTime),
+        };
+      }));
+
+      this.setData({
+        posts: myPosts,
+        loading: false
+      });
+
+    } catch (err) {
+      console.error('加载我的帖子失败:', err);
+      this.setData({ loading: false });
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none',
+      });
+    }
+  },
+
+  // 获取图片的临时链接
+  async getTempImageUrls(fileIDs: string[]): Promise<string[]> {
+    if (!fileIDs || fileIDs.length === 0 || !fileIDs[0]) {
+      return [];
+    }
+    try {
+      const result = await wx.cloud.getTempFileURL({
+        fileList: fileIDs,
+      });
+      return result.fileList.map((file: any) => file.tempFileURL);
+    } catch (err) {
+      console.error('获取图片临时链接失败:', err);
+      return [];
+    }
+  },
+
+  // 格式化时间
+  formatTime(date: Date): string {
+    const now = new Date();
+    const postDate = new Date(date);
+    const diff = now.getTime() - postDate.getTime();
+    
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    
+    if (minutes < 1) {
+      return '刚刚';
+    } else if (minutes < 60) {
+      return `${minutes}分钟前`;
+    } else if (hours < 24) {
+      return `${hours}小时前`;
+    } else if (days < 7) {
+      return `${days}天前`;
+    } else {
+      return postDate.toLocaleDateString();
+    }
   },
 
   // 帖子点击
